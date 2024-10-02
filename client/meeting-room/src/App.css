@@ -4,20 +4,19 @@ body {
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center; /* จัดกลางแนวนอน */
+  align-items: center; /* จัดกลางแนวตั้ง */
+  height: 100vh; /* ความสูงของหน้าจอ */
 }
 
 .container {
-  max-width: 100%;
-  margin: 0 auto;
+  max-width: 1200px; /* ความกว้างสูงสุด */
   padding: 20px;
-  /* จัดการการแสดงผลของรายการพนักงานให้อยู่กึ่งกลาง */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center; /* จัดข้อความให้อยู่กลาง */
 }
 
 .title {
-  text-align: center;
   margin-bottom: 40px;
   color: #333;
 }
