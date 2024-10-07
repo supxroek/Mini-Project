@@ -1,7 +1,9 @@
-import "./App.css";
-
 function Admin_Dashboard() {
-  return <div>Admin_Dashboard</div>;
+  return (
+    <>
+      <h1 className="text-center">Admin Dashboard</h1>
+    </>
+  );
 }
 
 export default Admin_Dashboard;
