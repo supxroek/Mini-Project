@@ -27,7 +27,6 @@ function App() {
               <th className="py-3 px-6 text-left">Name</th>
               <th className="py-3 px-6 text-left">Position</th>
               <th className="py-3 px-6 text-left">Department</th>
-              {/* เพิ่มคอลัมน์เพิ่มเติมตามที่คุณมีในฐานข้อมูล */}
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
@@ -36,14 +35,10 @@ function App() {
                 key={index}
                 className="border-b border-gray-300 hover:bg-gray-100"
               >
-                <td className="py-3 px-6 text-left">{employee[0]}</td>{" "}
-                {/* สมมติว่า employee[0] เป็น ID */}
-                <td className="py-3 px-6 text-left">{employee[1]}</td>{" "}
-                {/* สมมติว่า employee[1] เป็นชื่อ */}
-                <td className="py-3 px-6 text-left">{employee[2]}</td>{" "}
-                {/* สมมติว่า employee[2] เป็นตำแหน่ง */}
-                <td className="py-3 px-6 text-left">{employee[3]}</td>{" "}
-                {/* สมมติว่า employee[3] เป็นแผนก */}
+                <td className="py-3 px-6 text-left">{employee[0]}</td>
+                <td className="py-3 px-6 text-left">{employee[1]}</td>
+                <td className="py-3 px-6 text-left">{employee[2]}</td>
+                <td className="py-3 px-6 text-left">{employee[3]}</td>
               </tr>
             ))}
           </tbody>
