@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function User_Dashboard() {
+import Navbar from "../centrals/navbar-sections/Navbar";
+
+function Dashboard() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -17,6 +19,7 @@ function User_Dashboard() {
 
   return (
     <>
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Employee Information</h1>
         {data.length > 0 ? (
@@ -51,4 +54,4 @@ function User_Dashboard() {
   );
 }
 
-export default User_Dashboard;
+export default Dashboard;
