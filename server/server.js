@@ -1,33 +1,20 @@
-const express = require("express");
-const oracledb = require("oracledb");
-
 require("dotenv").config();
+const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
+
+// Middleware
+app.use(express.json());
 app.use(cors());
+app.use(helmet());
 
-// สร้างการเชื่อมต่อกับฐานข้อมูล Oracle
-async function getConnection() {
-  return await oracledb.getConnection({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    connectString: process.env.DB_CONNECT_STRING,
-  });
-}
+// Routes
+app.use("/api/auth", authRoutes);
 
-// สร้าง API ดึงข้อมูล
-app.get("/employee", async (req, res) => {
-  try {
-    const connection = await getConnection();
-    const result = await connection.execute("SELECT * FROM EMPLOYEES"); // เปลี่ยนเป็นตารางที่ต้องการ
-    res.json(result.rows);
-    await connection.close();
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
