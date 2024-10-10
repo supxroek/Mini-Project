@@ -31,6 +31,7 @@ const SignUp = () => {
       }
       setLoading(false);
     } catch (error) {
+      console.error("Error details:", error);
       setError(error.response?.data?.message || "An error occurred!");
       setLoading(false);
     }
@@ -39,13 +40,13 @@ const SignUp = () => {
   const password = watch("password");
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="card w-500 max-w-lg bg-base-100 shadow-xl p-6">
         <div className="card-body">
-          <h2 className="card-title">Sign Up</h2>
+          <h2 className="card-title text-center mb-4">Sign Up</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* ใช้ Grid สำหรับฟิลด์ที่อยู่ใน row เดียวกัน */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2 mb-2">
               <div className="form-control">
                 <label className="label">First Name</label>
                 <input
@@ -76,7 +77,7 @@ const SignUp = () => {
             </div>
 
             {/* ใช้ Grid สำหรับฟิลด์ที่อยู่ใน row เดียวกัน */}
-            <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-2 gap-2 mb-2">
               <div className="form-control">
                 <label className="label">Email</label>
                 <input
@@ -118,7 +119,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            <div className="form-control mt-4">
+            <div className="form-control mb-2">
               <label className="label">Password</label>
               <input
                 type="password"
@@ -138,7 +139,7 @@ const SignUp = () => {
               )}
             </div>
 
-            <div className="form-control mt-4">
+            <div className="form-control mb-2">
               <label className="label">Confirm Password</label>
               <input
                 type="password"
@@ -156,7 +157,7 @@ const SignUp = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-2 gap-2 mb-2">
               <div className="form-control">
                 <label className="label">Position</label>
                 <select
@@ -196,7 +197,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            <div className="form-control mt-4">
+            <div className="form-control mb-4">
               <button
                 type="submit"
                 className={`btn btn-primary ${loading ? "loading" : ""}`}
@@ -206,9 +207,9 @@ const SignUp = () => {
               </button>
             </div>
             {message && (
-              <p className="text-green-500 text-center mt-4">{message}</p>
+              <p className="text-green-500 text-center mt-2">{message}</p>
             )}
-            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+            {error && <p className="text-red-500 text-center mt-2">{error}</p>}
           </form>
         </div>
       </div>
