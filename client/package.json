@@ -10,12 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.10",
     "@tailwindcss/typography": "^0.5.15",
     "axios": "^1.7.7",
     "daisyui": "^4.12.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.0",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
