@@ -12,7 +12,7 @@ function Home() {
               excepturi exercitationem quasi. In deleniti eaque aut repudiandae
               et a id nisi.
             </p>
-            <Link to="/signIn" className="btn btn-primary">
+            <Link to="/login" className="btn btn-primary">
               Get Started
             </Link>
           </div>
@@ -31,7 +31,7 @@ function Home() {
               excepturi exercitationem quasi. In deleniti eaque aut repudiandae
               et a id nisi.
             </p>
-            <Link to="/signIn" className="btn btn-primary">
+            <Link to="/login" className="btn btn-primary">
               Get Started
             </Link>
           </div>
@@ -53,7 +53,7 @@ function Home() {
               excepturi exercitationem quasi. In deleniti eaque aut repudiandae
               et a id nisi.
             </p>
-            <Link to="/signIn" className="btn btn-primary">
+            <Link to="/login" className="btn btn-primary">
               Get Started
             </Link>
           </div>

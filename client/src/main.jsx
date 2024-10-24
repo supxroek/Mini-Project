@@ -4,8 +4,14 @@ import "./index.css";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/centrals/Home";
-import SignUp from "./components/centrals/SignUp";
-import SignIn from "./components/centrals/SignIn";
+import Register from "./components/centrals/register";
+import Login from "./components/centrals/login";
+import User_dashboard from "./components/users-sections/user_dashboard";
+import Admin_dashboard from "./components/admin-sections/admin_dashboard";
+import Employees from "./components/admin-sections/Employees";
+import Roles from "./components/admin-sections/Roles";
+import Rooms from "./components/admin-sections/Rooms";
+import Reports from "./components/admin-sections/reports";
 
 const router = createBrowserRouter([
   {
@@ -13,12 +19,36 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/SignUp",
-    element: <SignUp />,
+    path: "/register",
+    element: <Register />,
   },
   {
-    path: "/SignIn",
-    element: <SignIn />,
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/user_dashboard",
+    element: <User_dashboard />,
+  },
+  {
+    path: "/admin_dashboard",
+    element: <Admin_dashboard />,
+  },
+  {
+    path: "/employees",
+    element: <Employees />,
+  },
+  {
+    path: "/roles",
+    element: <Roles />,
+  },
+  {
+    path: "/rooms",
+    element: <Rooms />,
+  },
+  {
+    path: "/reports",
+    element: <Reports />,
   },
 ]);
 
