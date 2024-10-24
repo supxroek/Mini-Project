@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const {
@@ -14,6 +15,8 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const navigate = useNavigate(); // เรียกใช้ useNavigate
+
   const onSubmit = async (data) => {
     setError("");
     try {
@@ -26,6 +29,9 @@ const SignUp = () => {
       if (response.status === 201) {
         setMessage("Registration successful!");
         reset(); // เคลียร์ฟอร์ม
+        setTimeout(() => {
+          navigate("/login"); // Redirect ไปหน้า SignIn หลังจากสมัครสำเร็จ
+        }, 2000); // กำหนดเวลารอ 2 วินาทีก่อน redirect
       } else {
         setError("Registration failed!");
       }
@@ -43,7 +49,7 @@ const SignUp = () => {
     <div className="min-h-screen flex items-center justify-center bg-base-200">
       <div className="card w-500 max-w-lg bg-base-100 shadow-xl p-6">
         <div className="card-body">
-          <h2 className="card-title text-center mb-4">Sign Up</h2>
+          <h2 className="card-title text-center mb-4 text-2xl">Sign Up</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* ใช้ Grid สำหรับฟิลด์ที่อยู่ใน row เดียวกัน */}
             <div className="grid grid-cols-2 gap-2 mb-2">
@@ -167,8 +173,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Position</option>
-                  <option value="1">Manager</option>
-                  <option value="2">Employee</option>
+                  <option value="1">Employee</option>
+                  <option value="2">Manager</option>
+                  <option value="3">Deputy Director</option>
+                  <option value="4">Executive</option>
+                  <option value="5">Senior Executives</option>
                 </select>
                 {errors.position_id && (
                   <span className="text-red-500 text-sm">
@@ -186,8 +195,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Department</option>
-                  <option value="1">HR</option>
-                  <option value="2">IT</option>
+                  <option value="1">Personnel</option>
+                  <option value="2">Human Resources</option>
+                  <option value="3">Accounting</option>
+                  <option value="4">Sales</option>
+                  <option value="5">Engineering</option>
                 </select>
                 {errors.department_id && (
                   <span className="text-red-500 text-sm">
@@ -196,6 +208,7 @@ const SignUp = () => {
                 )}
               </div>
             </div>
+            <br />
 
             <div className="form-control mb-4">
               <button
@@ -206,6 +219,15 @@ const SignUp = () => {
                 Sign Up
               </button>
             </div>
+            <div className="text-center">
+              <p className="mt-4">
+                Already have an account?{" "}
+                <a href="/login" className="link">
+                  Login
+                </a>
+              </p>
+            </div>
+
             {message && (
               <p className="text-green-500 text-center mt-2">{message}</p>
             )}
