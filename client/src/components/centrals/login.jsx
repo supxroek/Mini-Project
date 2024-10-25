@@ -31,8 +31,10 @@ const Login = () => {
       setTimeout(() => {
         if (userRole === 1) {
           navigate("/admin_dashboard"); // Redirect ไปที่ dashboard สำหรับ Admin
+        } else if (userRole === null) {
+          navigate("/user_dashboard"); // Redirect ไปที่ dashboard สำหรับ Manager
         } else {
-          navigate("/user_dashboard"); // Redirect ไปที่ dashboard สำหรับ User ทั่วไป
+          navigate("/404"); // Redirect ไปที่ dashboard สำหรับ User ทั่วไป
         }
       }, 2000);
       // Handle redirection based on role from response data
@@ -76,6 +78,12 @@ const Login = () => {
                   {errors.password.message}
                 </span>
               )}
+            </div>
+
+            <div className="text-sm text-gray-600 text-right mt-2">
+              <a href="/forgot_password" className="link">
+                Forgot Password
+              </a>
             </div>
 
             <div className="form-control mt-4">

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./components/centrals/Home";
+import Home from "./components/centrals/home";
 import Register from "./components/centrals/register";
 import Login from "./components/centrals/login";
 import User_dashboard from "./components/users-sections/user_dashboard";
@@ -12,6 +12,8 @@ import Employees from "./components/admin-sections/Employees";
 import Roles from "./components/admin-sections/Roles";
 import Rooms from "./components/admin-sections/Rooms";
 import Reports from "./components/admin-sections/reports";
+import Error_page from "./components/centrals/errorpage";
+import Forgot_password from "./components/centrals/forgot_pass";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,14 @@ const router = createBrowserRouter([
   {
     path: "/reports",
     element: <Reports />,
+  },
+  {
+    path: "/404",
+    element: <Error_page />,
+  },
+  {
+    path: "/forgot_password",
+    element: <Forgot_password />,
   },
 ]);
 
