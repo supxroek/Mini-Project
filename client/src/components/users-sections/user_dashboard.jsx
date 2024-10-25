@@ -36,7 +36,7 @@ const User_dashboard = () => {
                 Dashboard
               </a>
               <a
-                href="/employees"
+                href="/booking"
                 className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
               >
                 <img
@@ -45,10 +45,10 @@ const User_dashboard = () => {
                   width="24"
                   height="24"
                 />
-                Employees
+                Booking
               </a>
               <a
-                href="/roles"
+                href="/history"
                 className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
               >
                 <img
@@ -57,31 +57,7 @@ const User_dashboard = () => {
                   width="24"
                   height="24"
                 />
-                Roles
-              </a>
-              <a
-                href="/rooms"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/livingroom.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
-                Rooms
-              </a>
-              <a
-                href="/reports"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/bar-chart.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
-                Report
+                History
               </a>
             </nav>
           </div>
@@ -188,7 +164,7 @@ const User_dashboard = () => {
                   className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
                 >
                   <li>
-                    <a className="justify-between">
+                    <a href="/profile" className="justify-between">
                       Profile
                       <span className="badge">New</span>
                     </a>
