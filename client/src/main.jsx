@@ -14,6 +14,9 @@ import Rooms from "./components/admin-sections/Rooms";
 import Reports from "./components/admin-sections/reports";
 import Error_page from "./components/centrals/errorpage";
 import Forgot_password from "./components/centrals/forgot_pass";
+import Booking from "./components/users-sections/booking";
+import History from "./components/users-sections/history";
+import Profile from "./components/users-sections/profile";
 
 const router = createBrowserRouter([
   {
@@ -60,6 +63,18 @@ const router = createBrowserRouter([
     path: "/forgot_password",
     element: <Forgot_password />,
   },
+  {
+    path: "/booking",
+    element: <Booking />,
+  },
+  {
+    path: "/history",
+    element: <History />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
