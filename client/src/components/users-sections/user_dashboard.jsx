@@ -173,7 +173,7 @@ const User_dashboard = () => {
                     <a>Settings</a>
                   </li>
                   <li>
-                    <a>Logout</a>
+                    <a href="/login">Logout</a>
                   </li>
                 </ul>
               </div>
@@ -183,7 +183,8 @@ const User_dashboard = () => {
             {/* Main Content */}
             <div className="p-6">
               <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-              {/* ส่วนที่จะแสดงรายละเอียดการจองล่าสุด */}
+
+              {/* ส่วนที่จะแสดงรายละเอียด */}
             </div>
           </div>
         </div>
