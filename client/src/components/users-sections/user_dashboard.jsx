@@ -3,38 +3,71 @@ import { useNavigate } from "react-router-dom";
 
 const User_dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [bookingCount, setBookingCount] = useState(0);
+  const [missedBookingCount, setMissedBookingCount] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
   const navigate = useNavigate();
 
-  // ตั้งค่าเวลาปัจจุบัน
+  // Update current time every second
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); // อัปเดตทุกๆ วินาที
+    }, 1000);
 
-    return () => clearInterval(interval); // Cleanup interval
+    return () => clearInterval(interval);
   }, []);
+
+  // Fetch booking and missed count from localStorage or API on load
+  useEffect(() => {
+    const storedBookingCount = localStorage.getItem("bookingCount");
+    const storedMissedBookingCount = localStorage.getItem("missedBookingCount");
+    if (storedBookingCount) setBookingCount(parseInt(storedBookingCount));
+    if (storedMissedBookingCount) setMissedBookingCount(parseInt(storedMissedBookingCount));
+
+    // Check if the user should be locked out
+    if (storedMissedBookingCount >= 3) setIsLocked(true);
+  }, []);
+
+  // Function to handle a successful booking
+  const handleBooking = () => {
+    if (isLocked) {
+      alert("คุณทำการจองห้องและไม่ได้เข้าใช้งานเกิน 3 ครั้ง กรุณาติดต่อเจ้าหน้าที่");
+      return;
+    }
+
+    setBookingCount(prev => {
+      const newCount = prev + 1;
+      localStorage.setItem("bookingCount", newCount);
+      return newCount;
+    });
+  };
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // ลบ token
-    navigate("/login"); // นำผู้ใช้ไปหน้า login
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("bookingCount");
+    localStorage.removeItem("missedBookingCount");
+    navigate("/login");
   };
 
-  // ดึงข้อมูลชื่อวัน, เดือน, และเวลา
+  const handleContactSupport = () => {
+    alert("กรุณาติดต่อเจ้าหน้าที่:\nโทรศัพท์: 02-123-4567\nอีเมล: support@example.com");
+  };
+
   const dayName = currentTime.toLocaleString("en-US", { weekday: "long" });
   const monthName = currentTime.toLocaleString("en-US", { month: "short" });
   const timeString = currentTime.toLocaleTimeString("en-US", {
-    hour12: false, // ใช้รูปแบบเวลา 24 ชั่วโมง
+    hour12: false,
   });
 
   return (
-    <div className="flex">
+    <div className="flex bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+      <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">
-            <a className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg">
+            <a className="flex items-center gap-2 p-3 bg-gray-700 rounded-lg">
               <img
                 src="/src/assets/dashboard.png"
                 alt="Dashboard Icon"
@@ -45,7 +78,7 @@ const User_dashboard = () => {
             </a>
             <a
               href="/booking"
-              className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
+              className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
             >
               <img
                 src="/src/assets/setting.png"
@@ -57,7 +90,7 @@ const User_dashboard = () => {
             </a>
             <a
               href="/history"
-              className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
+              className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
             >
               <img
                 src="/src/assets/hierarchical-structure.png"
@@ -70,10 +103,10 @@ const User_dashboard = () => {
           </nav>
         </div>
 
-        {/* ปุ่ม Logout */}
+        {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto"
+          className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg mt-auto"
         >
           <img
             src="/src/assets/logout.png"
@@ -88,33 +121,27 @@ const User_dashboard = () => {
       {/* Main Content */}
       <div className="flex-1">
         {/* Navbar */}
-        <div className="navbar bg-base-100">
+        <div className="navbar bg-gray-800">
           <div className="navbar-start m-4">
             <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl">
+                <span className="countdown font-mono font-semibold text-2xl text-white">
                   {dayName}
-                </span>{" "}
-                {/* แสดงชื่อวัน */}
+                </span>
               </div>
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl">
+                <span className="countdown font-mono font-semibold text-2xl text-white">
                   {monthName}
-                </span>{" "}
-                {/* แสดงชื่อเดือน */}
+                </span>
               </div>
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl">
+                <span className="countdown font-mono font-semibold text-2xl text-white">
                   {timeString}
-                </span>{" "}
-                {/* แสดงเวลา */}
+                </span>
               </div>
             </div>
           </div>
           <div className="navbar-end">
-            {/* Cart Dropdown */}
-
-            {/* User Dropdown */}
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
@@ -130,26 +157,34 @@ const User_dashboard = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+                className="menu menu-sm dropdown-content bg-gray-800 rounded-box z-[1] mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <a href="/profile" className="justify-between">
+                  <a href="/profile" className="justify-between text-white">
                     Profile
                     <span className="badge">New</span>
                   </a>
                 </li>
                 <li>
-                  <button onClick={handleLogout}>Logout</button>
+                  <button onClick={handleLogout} className="text-white">Logout</button>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        <div className="min-h-screen bg-base-200">
+
+        <div className="min-h-screen bg-gray-200">
           {/* Main Content */}
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-            {/* ส่วนที่จะแสดงรายละเอียด */}
+            <p className="text-gray-800">Bookings: {bookingCount}</p>
+            <p className="text-gray-800">Missed Bookings: {missedBookingCount}</p>
+            <button onClick={handleBooking} className="btn btn-primary text-white m-2 bg-gray-600 hover:bg-gray-500">
+              Book Now
+            </button>
+            <button onClick={handleContactSupport} className="btn btn-info text-white m-2 bg-gray-600 hover:bg-gray-500">
+              ติดต่อเจ้าหน้าที่
+            </button>
           </div>
         </div>
       </div>
