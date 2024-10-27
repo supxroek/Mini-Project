@@ -16,6 +16,7 @@
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "oracledb": "^6.6.0",
     "prop-types": "^15.8.1"
   },

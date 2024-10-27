@@ -31,7 +31,7 @@ const Login = () => {
       setTimeout(() => {
         if (userRole === 1) {
           navigate("/admin_dashboard"); // Redirect ไปที่ dashboard สำหรับ Admin
-        } else if (userRole === null) {
+        } else if (userRole === null || userRole === 2) {
           navigate("/user_dashboard"); // Redirect ไปที่ dashboard สำหรับ Manager
         } else {
           navigate("/404"); // Redirect ไปที่ dashboard สำหรับ User ทั่วไป

@@ -219,9 +219,6 @@ const Booking = () => {
                     </a>
                   </li>
                   <li>
-                    <a>Settings</a>
-                  </li>
-                  <li>
                     <a href="/login">Logout</a>
                   </li>
                 </ul>
