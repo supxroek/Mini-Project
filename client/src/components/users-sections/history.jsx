@@ -1,194 +1,121 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const History = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [bookings, setBookings] = useState([]);
 
+  // ดึงข้อมูลจาก LocalStorage เมื่อ component นี้ถูก mount
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000); // อัปเดตทุกๆ วินาที
-
-    return () => clearInterval(interval); // Cleanup เมื่อตัว component ถูกยกเลิก
+    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    setBookings(storedBookings);
   }, []);
 
-  // ดึงข้อมูลชื่อวัน, เดือน, และเวลาในรูปแบบที่ต้องการ
-  const dayName = currentTime.toLocaleString("en-US", { weekday: "long" });
-  const monthName = currentTime.toLocaleString("en-US", { month: "short" });
-  const timeString = currentTime.toLocaleTimeString("en-US", {
-    hour12: false, // ใช้รูปแบบเวลา 24 ชั่วโมง
-  });
+  // ฟังก์ชันสำหรับยกเลิกการจอง
+  const handleCancel = (id) => {
+    const updatedBookings = bookings.filter((booking) => booking.id !== id);
+    setBookings(updatedBookings);
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+    alert("ยกเลิกการจองสำเร็จ!");
+  };
 
   return (
-    <>
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
-          <div className="flex flex-col">
-            <a className="text-2xl font-semibold mb-6">Logo</a>
-            <nav className="flex flex-col gap-3">
-              <a href="/user_dashboard" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
-                <img
-                  src="/src/assets/dashboard.png"
-                  alt="My Icon"
-                  width="20"
-                  height="20"
-                />
-                Dashboard
-              </a>
-              <a
-                href="/booking"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/setting.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
-                Booking
-              </a>
-              <a
-                href="/history"
-                className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/hierarchical-structure.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
-                History
-              </a>
-            </nav>
+    <div className="flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+        <div className="flex flex-col">
+          <a className="text-2xl font-semibold mb-6">Logo</a>
+          <nav className="flex flex-col gap-3">
+            <a
+              href="/user_dashboard"
+              className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
+            >
+              <img
+                src="/src/assets/dashboard.png"
+                alt="Dashboard"
+                width="20"
+                height="20"
+              />
+              Dashboard
+            </a>
+            <a
+              href="/booking"
+              className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
+            >
+              <img
+                src="/src/assets/setting.png"
+                alt="Booking"
+                width="24"
+                height="24"
+              />
+              Booking
+            </a>
+            <a
+              href="/history"
+              className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg"
+            >
+              <img
+                src="/src/assets/hierarchical-structure.png"
+                alt="History"
+                width="24"
+                height="24"
+              />
+              History
+            </a>
+          </nav>
+        </div>
+        <a
+          href="/login"
+          className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto"
+        >
+          <img
+            src="/src/assets/logout.png"
+            alt="Logout"
+            width="24"
+            height="24"
+          />
+          Logout
+        </a>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="navbar bg-base-100">
+          <div className="navbar-start m-4">
+            <h1 className="text-2xl font-bold">Booking History</h1>
           </div>
+        </div>
 
-          {/* ปุ่ม Logout */}
-          <a
-            href="/login"
-            className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto"
-          >
-            <img
-              src="/src/assets/logout.png"
-              alt="My Icon"
-              width="24"
-              height="24"
-            />
-            Logout
-          </a>
-        </aside>
-
-        {/* Main Content */}
-        <div className="flex-1">
-          {/* Navbar */}
-          <div className="navbar bg-base-100">
-            <div className="navbar-start m-4">
-              <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">
-                    {dayName}
-                  </span>{" "}
-                  {/* แสดงชื่อวัน */}
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">
-                    {monthName}
-                  </span>{" "}
-                  {/* แสดงชื่อเดือน */}
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">
-                    {timeString}
-                  </span>{" "}
-                  {/* แสดงเวลา */}
-                </div>
-              </div>
-            </div>
-            <div className="navbar-end">
-              {/* Cart Dropdown */}
-              <div className="dropdown dropdown-end">
+        <div className="min-h-screen bg-base-200 p-6">
+          <div className="grid grid-cols-1 gap-4">
+            {bookings.length > 0 ? (
+              bookings.map((booking) => (
                 <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle"
+                  key={booking.id}
+                  className="p-4 bg-white rounded-lg shadow flex justify-between items-center"
                 >
-                  <div className="indicator">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <span className="badge badge-sm indicator-item">8</span>
+                  <div>
+                    <p><strong>ID:</strong> {booking.id}</p>
+                    <p><strong>Date:</strong> {booking.date}</p>
+                    <p><strong>Time:</strong> {booking.time}</p>
+                    <p><strong>Persons:</strong> {booking.persons}</p>
+                    <p><strong>Status:</strong> {booking.status}</p>
                   </div>
+                  <button
+                    className="btn btn-error"
+                    onClick={() => handleCancel(booking.id)}
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <div
-                  tabIndex={0}
-                  className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-                >
-                  <div className="card-body">
-                    <span className="text-lg font-bold">8 Items</span>
-                    <span className="text-info">Subtotal: $999</span>
-                    <div className="card-actions">
-                      <button className="btn btn-primary btn-block">
-                        View cart
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* User Dropdown */}
-              <div className="dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle avatar"
-                >
-                  <div className="w-10 rounded-full">
-                    <img
-                      alt="User Avatar"
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                    />
-                  </div>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-                >
-                  <li>
-                    <a href="/profile" className="justify-between">
-                      Profile
-                      <span className="badge">New</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>Settings</a>
-                  </li>
-                  <li>
-                    <a>Logout</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="min-h-screen bg-base-200">
-            {/* Main Content */}
-            <div className="p-6">
-              <h1 className="text-2xl font-bold mb-4">History</h1>
-              {/* ส่วนที่จะแสดงรายละเอียดการจองล่าสุด */}
-            </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">
+                No bookings found.
+              </p>
+            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

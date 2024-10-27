@@ -1,78 +1,116 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const Booking = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [date, setDate] = useState(""); // เก็บค่าวันที่เลือก
-  const [time, setTime] = useState(""); // เก็บช่วงเวลาที่เลือก
-  const [persons, setPersons] = useState(""); // เก็บจำนวนคนที่เลือก
+const BookingHistoryApp = () => {
+  const [currentTab, setCurrentTab] = useState("booking"); // state สำหรับสลับระหว่าง Booking และ History
+  const [bookings, setBookings] = useState([]);
+  const [date, setDate] = useState(""); 
+  const [time, setTime] = useState(""); 
+  const [persons, setPersons] = useState("");
 
+  // ดึงข้อมูลการจองจาก LocalStorage
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000); // อัปเดตทุกวินาที
-
-    return () => clearInterval(interval); // Cleanup เมื่อตัว component ถูกยกเลิก
+    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    setBookings(storedBookings);
   }, []);
 
-  const dayName = currentTime.toLocaleString("en-US", { weekday: "long" });
-  const monthName = currentTime.toLocaleString("en-US", { month: "short" });
-  const timeString = currentTime.toLocaleTimeString("en-US", { hour12: false });
-
   const handleBooking = () => {
-    alert(`Booking on ${date}, Time: ${time}, Persons: ${persons}`);
-    // เพิ่มฟังก์ชันส่งข้อมูลการจองไปยัง backend ได้ที่นี่
+    if (!date || !time || !persons) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    const bookingData = {
+      id: Math.floor(Math.random() * 1000000).toString(),
+      date,
+      time,
+      persons,
+      status: "รอการยืนยัน",
+    };
+
+    const updatedBookings = [...bookings, bookingData];
+    setBookings(updatedBookings);
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+
+    alert("การจองสำเร็จ!");
+    setDate("");
+    setTime("");
+    setPersons("");
+  };
+
+  const handleCancel = (id) => {
+    const updatedBookings = bookings.filter((booking) => booking.id !== id);
+    setBookings(updatedBookings);
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+    alert("ยกเลิกการจองสำเร็จ!");
   };
 
   return (
-    <>
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
-          <div className="flex flex-col">
-            <a className="text-2xl font-semibold mb-6">Logo</a>
-            <nav className="flex flex-col gap-3">
-              <a href="/user_dashboard" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
+    <div className="flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+        <div className="flex flex-col">
+          <a className="text-2xl font-semibold mb-6">Logo</a>
+          <nav className="flex flex-col gap-3">
+          <a href="/user_dashboard" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
                 <img src="/src/assets/dashboard.png" alt="Dashboard" width="20" height="20" />
                 Dashboard
               </a>
-              <a href="/booking" className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg">
-                <img src="/src/assets/setting.png" alt="Booking" width="24" height="24" />
-                Booking
-              </a>
-              <a href="/history" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
-                <img src="/src/assets/hierarchical-structure.png" alt="History" width="24" height="24" />
-                History
-              </a>
-            </nav>
+            <button
+              onClick={() => setCurrentTab("booking")}
+              className={`flex items-center gap-2 p-3 ${
+                currentTab === "booking" ? "bg-indigo-700" : "hover:bg-indigo-700"
+              } rounded-lg`}
+            >
+              <img
+                src="/src/assets/setting.png"
+                alt="Booking"
+                width="24"
+                height="24"
+              />
+              Booking
+            </button>
+            <button
+              onClick={() => setCurrentTab("history")}
+              className={`flex items-center gap-2 p-3 ${
+                currentTab === "history" ? "bg-indigo-700" : "hover:bg-indigo-700"
+              } rounded-lg`}
+            >
+              <img
+                src="/src/assets/hierarchical-structure.png"
+                alt="History"
+                width="24"
+                height="24"
+              />
+              History
+            </button>
+          </nav>
+        </div>
+        <a
+          href="/login"
+          className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto"
+        >
+          <img
+            src="/src/assets/logout.png"
+            alt="Logout"
+            width="24"
+            height="24"
+          />
+          Logout
+        </a>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="navbar bg-base-100">
+          <div className="navbar-start m-4">
+            <h1 className="text-2xl font-bold">
+              {currentTab === "booking" ? "Book a Room" : "Booking History"}
+            </h1>
           </div>
-          <a href="/login" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto">
-            <img src="/src/assets/logout.png" alt="Logout" width="24" height="24" />
-            Logout
-          </a>
-        </aside>
+        </div>
 
-        {/* Main Content */}
-        <div className="flex-1">
-          <div className="navbar bg-base-100">
-            <div className="navbar-start m-4">
-              <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">{dayName}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">{monthName}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl">{timeString}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="min-h-screen bg-base-200 p-6">
-            <h1 className="text-2xl font-bold mb-4">Book a Room</h1>
-
-            {/* ฟอร์มการจอง */}
+        <div className="min-h-screen bg-base-200 p-6">
+          {currentTab === "booking" ? (
             <div className="flex flex-col gap-4 max-w-md mx-auto p-6 bg-white rounded-lg shadow">
               <label className="font-semibold">Date</label>
               <input
@@ -83,7 +121,11 @@ const Booking = () => {
               />
 
               <label className="font-semibold">Time</label>
-              <select className="select select-bordered" value={time} onChange={(e) => setTime(e.target.value)}>
+              <select
+                className="select select-bordered"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              >
                 <option value="" disabled>Select Time</option>
                 <option value="10:00 - 12:00">10:00 - 12:00</option>
                 <option value="13:00 - 15:00">13:00 - 15:00</option>
@@ -91,7 +133,11 @@ const Booking = () => {
               </select>
 
               <label className="font-semibold">Persons</label>
-              <select className="select select-bordered" value={persons} onChange={(e) => setPersons(e.target.value)}>
+              <select
+                className="select select-bordered"
+                value={persons}
+                onChange={(e) => setPersons(e.target.value)}
+              >
                 <option value="" disabled>Select Persons</option>
                 <option value="1-5">1-5</option>
                 <option value="6-10">6-10</option>
@@ -102,19 +148,40 @@ const Booking = () => {
                 Book Now
               </button>
             </div>
-
-            {/* รูปตัวอย่างห้อง */}
-            <h2 className="text-xl font-bold mt-10 mb-4">Room Sample</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <img src="room1.jpg" alt="Room 1" className="rounded-lg shadow" />
-              <img src="room2.jpg" alt="Room 2" className="rounded-lg shadow" />
-              <img src="room3.jpg" alt="Room 3" className="rounded-lg shadow" />
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {bookings.length > 0 ? (
+                bookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="p-4 bg-white rounded-lg shadow flex justify-between items-center"
+                  >
+                    <div>
+                      <p><strong>ID:</strong> {booking.id}</p>
+                      <p><strong>Date:</strong> {booking.date}</p>
+                      <p><strong>Time:</strong> {booking.time}</p>
+                      <p><strong>Persons:</strong> {booking.persons}</p>
+                      <p><strong>Status:</strong> {booking.status}</p>
+                    </div>
+                    <button
+                      className="btn btn-error"
+                      onClick={() => handleCancel(booking.id)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">
+                  No bookings found.
+                </p>
+              )}
             </div>
-          </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default Booking;
+export default BookingHistoryApp;
