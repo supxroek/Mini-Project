@@ -1,105 +1,104 @@
 import { useState, useEffect } from "react";
-import { Dialog } from "@headlessui/react"; // ต้องติดตั้ง @headlessui/react
 
 const Employees = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [employees, setEmployees] = useState([]);
-  const [formData, setFormData] = useState({
-    id: null,
-    name: "",
-    surname: "", // เพิ่มฟิลด์นามสกุล
-    phone: "", // เพิ่มฟิลด์เบอร์โทร
-    jobTitle: "",
-    department: "", // เพิ่มฟิลด์แผนก
-    accessRights: "", // เพิ่มฟิลด์สิทธิ์การเข้าใช้งาน
-    imgSrc: "",
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // สถานะเปิดปิด Modal
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/getUsers");
+        const response = await fetch(
+          "http://localhost:5000/api/auth/list-employees"
+        );
         const data = await response.json();
-        setEmployees(data);
+        setEmployees(data.employees);
       } catch (error) {
         console.error("Error fetching employees:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchEmployees();
+    return () => clearInterval(interval);
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleEdit = (employee) => {
+    setEditMode(true);
+    setSelectedEmployee(employee);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     try {
-      const response = isEditing
-        ? await fetch(
-            `http://localhost:5000/api/auth/updateUser/${formData.id}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(formData),
-            }
-          )
-        : await fetch("http://localhost:5000/api/auth/addUser", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-          });
-      const data = await response.json();
-      setEmployees((prev) =>
-        isEditing
-          ? prev.map((employee) =>
-              employee.id === formData.id ? data : employee
-            )
-          : [...prev, data]
+      const response = await fetch(
+        `http://localhost:5000/api/auth/update-employee/${selectedEmployee.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            employee_id: selectedEmployee.id,
+            fname: selectedEmployee.fname,
+            lname: selectedEmployee.lname,
+            email: selectedEmployee.email,
+            pnumber: selectedEmployee.pnumber,
+            position_id: selectedEmployee.position_id,
+            department_id: selectedEmployee.department_id,
+            role_id: selectedEmployee.role_id,
+          }),
+        }
       );
-      setFormData({
-        id: null,
-        name: "",
-        surname: "", // รีเซ็ตฟิลด์นามสกุล
-        phone: "", // รีเซ็ตฟิลด์เบอร์โทร
-        jobTitle: "",
-        department: "", // รีเซ็ตฟิลด์แผนก
-        accessRights: "", // รีเซ็ตฟิลด์สิทธิ์การเข้าใช้งาน
-        imgSrc: "",
-      });
-      setIsEditing(false);
-      setIsOpen(false); // ปิด Modal
+
+      if (!response.ok) {
+        throw new Error("Failed to update employee");
+      }
+
+      // อัปเดตข้อมูลใน State
+      setEmployees((prev) =>
+        prev.map((emp) =>
+          emp.id === selectedEmployee.id ? selectedEmployee : emp
+        )
+      );
+
+      setEditMode(false);
+      setSelectedEmployee(null);
     } catch (error) {
       console.error("Error saving employee:", error);
     }
   };
 
-  const handleEdit = (employee) => {
-    setFormData(employee);
-    setIsEditing(true);
-    setIsOpen(true); // เปิด Modal
-  };
-
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/auth/deleteUser/${id}`, {
+      await fetch(`http://localhost:5000/api/auth/delete-employee/${id}`, {
         method: "DELETE",
       });
       setEmployees((prev) => prev.filter((employee) => employee.id !== id));
     } catch (error) {
       console.error("Error deleting employee:", error);
+    }
+  };
+
+  const handleLockUser = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/api/auth/lock-employee/${id}`, {
+        method: "PATCH", // ใช้ PATCH สำหรับการล็อกผู้ใช้
+      });
+      // อัปเดตข้อมูลใน State หากจำเป็น
+      setEmployees((prev) =>
+        prev.map((employee) =>
+          employee.id === id ? { ...employee, locked: true } : employee
+        )
+      );
+    } catch (error) {
+      console.error("Error locking employee:", error);
     }
   };
 
@@ -247,196 +246,187 @@ const Employees = () => {
           </div>
         </div>
 
-        <div className="min-h-screen bg-base-200 p-6">
-          {/* ปุ่ม New Employee */}
-          <button
-            className="btn mb-4"
-            onClick={() => {
-              setIsOpen(true);
-              setFormData({
-                id: null,
-                name: "",
-                surname: "",
-                phone: "",
-                jobTitle: "",
-                department: "",
-                accessRights: "",
-                imgSrc: "",
-              });
-              setIsEditing(false);
-            }}
-          >
-            New Employee
-          </button>
-
-          {/* Modal สำหรับเพิ่ม/แก้ไขพนักงาน */}
-          <Dialog
-            open={isOpen}
-            onClose={() => setIsOpen(false)}
-            className="relative z-10"
-          >
-            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-              <Dialog.Panel className="bg-white rounded max-w-lg w-full p-6">
-                <Dialog.Title className="text-lg font-bold mb-4">
-                  {isEditing ? "Edit Employee" : "Add Employee"}
-                </Dialog.Title>
-                <form onSubmit={handleSubmit}>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Surname</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="surname"
-                      value={formData.surname}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Phone</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Job Title</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="jobTitle"
-                      value={formData.jobTitle}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Department</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="department"
-                      value={formData.department}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Access Rights</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="accessRights"
-                      value={formData.accessRights}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                      required
-                    />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Image URL</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="imgSrc"
-                      value={formData.imgSrc}
-                      onChange={handleInputChange}
-                      className="input input-bordered"
-                    />
-                  </div>
-                  <div className="modal-action">
-                    <button type="submit" className="btn">
-                      {isEditing ? "Update" : "Add"}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </Dialog.Panel>
-            </div>
-          </Dialog>
-
-          {/* ตารางพนักงาน */}
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Phone</th>
-                <th>Job Title</th>
-                <th>Department</th>
-                <th>Access Rights</th>
-                <th>Image</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((employee) => (
-                <tr key={employee.id}>
-                  <td>{employee.name}</td>
-                  <td>{employee.surname}</td>
-                  <td>{employee.phone}</td>
-                  <td>{employee.jobTitle}</td>
-                  <td>{employee.department}</td>
-                  <td>{employee.accessRights}</td>
-                  <td>
-                    <img
-                      src={employee.imgSrc}
-                      alt={employee.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => handleEdit(employee)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDelete(employee.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+        {/* Main Content */}
+        <div className="p-4">
+          <h1 className="text-2xl font-semibold mb-4">Employees</h1>
+          <div className="overflow-x-auto">
+            <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone Number</th>
+                  <th>Position ID</th>
+                  <th>Department ID</th>
+                  <th>Role ID</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="9" className="text-center">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : (
+                  employees.map((employee) => (
+                    <tr key={employee.id}>
+                      <td>{employee.id}</td>
+                      <td>{employee.fname}</td>
+                      <td>{employee.lname}</td>
+                      <td>{employee.email}</td>
+                      <td>{employee.pnumber}</td>
+                      <td>{employee.position_id}</td>
+                      <td>{employee.department_id}</td>
+                      <td>{employee.role_id}</td>
+                      <td>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEdit(employee)}
+                            className="btn btn-sm btn-ghost"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleLockUser(employee.id)}
+                            className="btn btn-sm btn-warning"
+                          >
+                            Lock User
+                          </button>
+                          <button
+                            onClick={() => handleDelete(employee.id)}
+                            className="btn btn-sm btn-error"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {editMode && selectedEmployee && (
+            <div className="edit-form mt-6">
+              <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
+              <div className="space-y-4">
+                <div>
+                  <label>First Name:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.fname}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        fname: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Last Name:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.lname}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        lname: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Email:</label>
+                  <input
+                    type="email"
+                    value={selectedEmployee.email}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        email: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Phone Number:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.pnumber}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        pnumber: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Position ID:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.position_id}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        position_id: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Department ID:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.department_id}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        department_id: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div>
+                  <label>Role ID:</label>
+                  <input
+                    type="text"
+                    value={selectedEmployee.role_id}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        role_id: e.target.value,
+                      })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <button onClick={handleSave} className="btn btn-primary mt-4">
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditMode(false)}
+                    className="btn btn-ghost mt-4"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

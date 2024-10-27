@@ -11,24 +11,31 @@ const Admin_dashboard = () => {
     const fetchData = async () => {
       try {
         const employeesResponse = await fetch(
-          "http://localhost:5000/api/auth/getTotalUsers"
+          "http://localhost:5000/api/auth/total-users"
         );
         if (!employeesResponse.ok) {
           throw new Error(`HTTP error! status: ${employeesResponse.status}`);
         }
-
         const employeesData = await employeesResponse.json();
-        setTotalEmployees(employeesData.total); // เข้าถึงค่าจำนวนพนักงานที่ส่งกลับ
+        setTotalEmployees(employeesData.total_users); // เปลี่ยนเป็น total_users
 
-        // ดึงข้อมูลสำหรับ rooms และ roles เช่นเดียวกัน
-        const roomsResponse = await fetch("/api/rooms");
-        const rolesResponse = await fetch("/api/roles");
-
+        const roomsResponse = await fetch(
+          "http://localhost:5000/api/auth/total-rooms"
+        );
+        if (!roomsResponse.ok) {
+          throw new Error(`HTTP error! status: ${roomsResponse.status}`);
+        }
         const roomsData = await roomsResponse.json();
-        const rolesData = await rolesResponse.json();
+        setTotalRooms(roomsData.total_rooms); // เปลี่ยนเป็น total_rooms
 
-        setTotalRooms(roomsData.length); // จำนวนห้อง
-        setTotalRoles(rolesData.length); // จำนวนบทบาท
+        const rolesResponse = await fetch(
+          "http://localhost:5000/api/auth/total-roles"
+        );
+        if (!rolesResponse.ok) {
+          throw new Error(`HTTP error! status: ${rolesResponse.status}`);
+        }
+        const rolesData = await rolesResponse.json();
+        setTotalRoles(rolesData.total_roles); // เปลี่ยนเป็น total_roles
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
