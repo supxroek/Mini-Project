@@ -75,7 +75,10 @@ const Booking = () => {
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
-              <a className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg">
+              <a
+                href="/user_dashboard"
+                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
+              >
                 <img
                   src="/src/assets/dashboard.png"
                   alt="My Icon"
@@ -84,10 +87,7 @@ const Booking = () => {
                 />
                 Dashboard
               </a>
-              <a
-                href="/booking"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
+              <a className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg">
                 <img
                   src="/src/assets/setting.png"
                   alt="My Icon"
