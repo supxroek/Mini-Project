@@ -7,7 +7,6 @@ const rooms = [
     name: "ห้องประชุม A",
     description: "ห้องประชุมมาตรฐานสำหรับการประชุมทั่วไป",
     imageUrl: "room1.jpg",
-    price: "1,000 บาท/ชั่วโมง",
   },
   {
     id: 2,
@@ -15,15 +14,13 @@ const rooms = [
     name: "ห้องประชุม VIP B",
     description: "ห้องประชุม VIP พร้อมอุปกรณ์ครบครัน",
     imageUrl: "room2.jpg",
-    price: "3,500 บาท/ชั่วโมง",
-  },
+    },
   {
     id: 3,
     type: "ธรรมดา",
     name: "ห้องประชุม C",
     description: "ห้องประชุมขนาดเล็กสำหรับทีมเล็ก",
     imageUrl: "room3.jpg",
-    price: "800 บาท/ชั่วโมง",
   },
 ];
 
