@@ -61,13 +61,13 @@ const Profile = () => {
   return (
     <div className="flex bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
+      <aside className="w-64 bg-primary min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">
             <a
               href="/user_dashboard"
-              className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
+              className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg"
             >
               <img
                 src="/src/assets/dashboard.png"
@@ -79,7 +79,7 @@ const Profile = () => {
             </a>
             <a
               href="/booking"
-              className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
+              className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg"
             >
               <img
                 src="/src/assets/setting.png"
@@ -91,7 +91,7 @@ const Profile = () => {
             </a>
             <a
               href="/history"
-              className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
+              className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg"
             >
               <img
                 src="/src/assets/hierarchical-structure.png"
@@ -105,7 +105,7 @@ const Profile = () => {
         </div>
         <a
           href="/login"
-          className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg mt-auto"
+          className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg mt-auto"
         >
           Logout
         </a>
@@ -113,21 +113,21 @@ const Profile = () => {
 
       <div className="flex-1">
         {/* Navbar */}
-        <div className="navbar bg-gray-800">
+        <div className="navbar bg-base-100">
           <div className="navbar-start m-4">
             <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl text-white">
+                <span className="countdown font-mono font-semibold text-2xl text-black">
                   {dayName}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl text-white">
+                <span className="countdown font-mono font-semibold text-2xl text-black">
                   {monthName}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="countdown font-mono font-semibold text-2xl text-white">
+                <span className="countdown font-mono font-semibold text-2xl text-black">
                   {timeString}
                 </span>
               </div>

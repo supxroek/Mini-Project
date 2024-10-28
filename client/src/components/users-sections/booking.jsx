@@ -116,13 +116,13 @@ const Booking = () => {
     <>
       <div className="flex bg-gray-100">
         {/* Sidebar */}
-        <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
+        <aside className="w-64 bg-primary min-h-screen p-4 text-white flex flex-col justify-between">
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
               <a
                 href="/user_dashboard"
-                className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
+                className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg"
               >
                 <img
                   src="/src/assets/dashboard.png"
@@ -132,7 +132,7 @@ const Booking = () => {
                 />
                 Dashboard
               </a>
-              <a className="flex items-center gap-2 p-3 bg-gray-700 rounded-lg">
+              <a className="flex items-center gap-2 p-3 bg-neutral rounded-lg">
                 <img
                   src="/src/assets/setting.png"
                   alt="My Icon"
@@ -143,7 +143,7 @@ const Booking = () => {
               </a>
               <a
                 href="/history"
-                className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg"
+                className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg"
               >
                 <img
                   src="/src/assets/hierarchical-structure.png"
@@ -159,7 +159,7 @@ const Booking = () => {
           {/* Logout Button */}
           <a
             href="/login"
-            className="flex items-center gap-2 p-3 hover:bg-gray-700 rounded-lg mt-auto"
+            className="flex items-center gap-2 p-3 hover:bg-neutral rounded-lg mt-auto"
           >
             <img
               src="/src/assets/logout.png"
@@ -170,25 +170,23 @@ const Booking = () => {
             Logout
           </a>
         </aside>
-
-        {/* Main Content */}
         <div className="flex-1">
           {/* Navbar */}
-          <div className="navbar bg-gray-800">
+          <div className="navbar bg-base-100">
             <div className="navbar-start m-4">
               <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                 <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl text-white">
+                  <span className="countdown font-mono font-semibold text-2xl text-black">
                     {dayName}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl text-white">
+                  <span className="countdown font-mono font-semibold text-2xl text-black">
                     {monthName}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="countdown font-mono font-semibold text-2xl text-white">
+                  <span className="countdown font-mono font-semibold text-2xl text-black">
                     {timeString}
                   </span>
                 </div>
@@ -201,7 +199,6 @@ const Booking = () => {
                   tabIndex={0}
                   role="button"
                   className="btn btn-ghost btn-circle"
-                  onClick={handleViewCart}
                 >
                   <div className="indicator">
                     <svg
@@ -209,7 +206,7 @@ const Booking = () => {
                       className="h-5 w-5 text-white"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
+                      stroke="black"
                     >
                       <path
                         strokeLinecap="round"
@@ -273,129 +270,132 @@ const Booking = () => {
             </div>
           </div>
 
-          <div className="p-8">
-            {step === 1 && (
-              <div>
-                <h2 className="text-xl mb-4">
-                  กรุณาเลือกวันและเวลาที่ต้องการจอง
-                </h2>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="input input-bordered w-full mb-2"
-                  placeholder="Select Date"
-                />
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="input input-bordered w-full mb-2"
-                  placeholder="Select Time"
-                />
-                <input
-                  type="number"
-                  value={persons}
-                  onChange={(e) => setPersons(e.target.value)}
-                  className="input input-bordered w-full mb-4"
-                  placeholder="Number of Persons"
-                />
-                <button
-                  onClick={handleProceedToRooms}
-                  className="btn bg-gray-600 text-white hover:bg-gray-700"
-                >
-                  Proceed to Select Room
-                </button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div>
-                <h2 className="text-xl mb-4">เลือกห้องประชุม</h2>
-                <div className="grid grid-cols-3 gap-4">
-                  {rooms.map((room) => (
-                    <div
-                      key={room.id}
-                      className="card bg-gray-300 shadow-xl cursor-pointer"
-                      onClick={() => handleRoomSelection(room)}
-                    >
-                      <figure>
-                        <img src={room.imageUrl} alt={room.name} />
-                      </figure>
-                      <div className="card-body">
-                        <h2 className="card-title">{room.name}</h2>
-                        <p>{room.description}</p>
-                        <p>ราคา: {room.price}</p>
-                      </div>
-                    </div>
-                  ))}
+          {/* Main Content */}
+          <div className="min-h-screen bg-base-200">
+            <div className="p-8">
+              {step === 1 && (
+                <div>
+                  <h2 className="text-xl mb-4">
+                    กรุณาเลือกวันและเวลาที่ต้องการจอง
+                  </h2>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="input input-bordered w-full mb-2"
+                    placeholder="Select Date"
+                  />
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="input input-bordered w-full mb-2"
+                    placeholder="Select Time"
+                  />
+                  <input
+                    type="number"
+                    value={persons}
+                    onChange={(e) => setPersons(e.target.value)}
+                    className="input input-bordered w-full mb-4"
+                    placeholder="Number of Persons"
+                  />
+                  <button
+                    onClick={handleProceedToRooms}
+                    className="btn bg-gray-600 text-white hover:bg-gray-700"
+                  >
+                    Proceed to Select Room
+                  </button>
                 </div>
-                {selectedRoom && (
-                  <div className="mt-4">
-                    <h3>ห้องที่เลือก: {selectedRoom.name}</h3>
-                    <input
-                      type="text"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className="input input-bordered w-full mb-2"
-                      placeholder="ชื่อ"
-                    />
-                    <input
-                      type="text"
-                      value={customerContact}
-                      onChange={(e) => setCustomerContact(e.target.value)}
-                      className="input input-bordered w-full mb-4"
-                      placeholder="เบอร์โทร"
-                    />
-                    <button
-                      onClick={handleConfirmBooking}
-                      className="btn btn-primary"
-                    >
-                      ยืนยันการจอง
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
 
-            {/* View Cart Step */}
-            {step === 4 && (
-              <div>
-                <h2 className="text-xl mb-4">Cart Details</h2>
-                {cart.length > 0 ? (
-                  cart.map((booking, index) => (
-                    <div key={index} className="border-b pb-2 mb-2">
-                      <h3>{booking.room.name}</h3>
-                      <p>วันที่: {booking.date}</p>
-                      <p>เวลา: {booking.time}</p>
-                      <p>จำนวนคน: {booking.persons}</p>
-                      <p>ชื่อ: {booking.customerName}</p>
-                      <p>เบอร์โทร: {booking.customerContact}</p>
-                      <button
-                        className="btn btn-success mt-2"
-                        onClick={() => handleConfirmSingleBooking(booking)}
+              {step === 2 && (
+                <div>
+                  <h2 className="text-xl mb-4">เลือกห้องประชุม</h2>
+                  <div className="grid grid-cols-3 gap-4">
+                    {rooms.map((room) => (
+                      <div
+                        key={room.id}
+                        className="card bg-gray-300 shadow-xl cursor-pointer"
+                        onClick={() => handleRoomSelection(room)}
                       >
-                        Confirm Booking
+                        <figure>
+                          <img src={room.imageUrl} alt={room.name} />
+                        </figure>
+                        <div className="card-body">
+                          <h2 className="card-title">{room.name}</h2>
+                          <p>{room.description}</p>
+                          <p>ราคา: {room.price}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedRoom && (
+                    <div className="mt-4">
+                      <h3>ห้องที่เลือก: {selectedRoom.name}</h3>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        className="input input-bordered w-full mb-2"
+                        placeholder="ชื่อ"
+                      />
+                      <input
+                        type="text"
+                        value={customerContact}
+                        onChange={(e) => setCustomerContact(e.target.value)}
+                        className="input input-bordered w-full mb-4"
+                        placeholder="เบอร์โทร"
+                      />
+                      <button
+                        onClick={handleConfirmBooking}
+                        className="btn btn-primary"
+                      >
+                        ยืนยันการจอง
                       </button>
                     </div>
-                  ))
-                ) : (
-                  <p>No bookings in cart.</p>
-                )}
-                <button
-                  className="btn btn-success"
-                  onClick={handleConfirmAllBookings}
-                >
-                  Confirm All Bookings
-                </button>
-                <button
-                  className="btn btn-secondary ml-2"
-                  onClick={() => setStep(1)}
-                >
-                  Back to Booking
-                </button>
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+
+              {/* View Cart Step */}
+              {step === 4 && (
+                <div>
+                  <h2 className="text-xl mb-4">Cart Details</h2>
+                  {cart.length > 0 ? (
+                    cart.map((booking, index) => (
+                      <div key={index} className="border-b pb-2 mb-2">
+                        <h3>{booking.room.name}</h3>
+                        <p>วันที่: {booking.date}</p>
+                        <p>เวลา: {booking.time}</p>
+                        <p>จำนวนคน: {booking.persons}</p>
+                        <p>ชื่อ: {booking.customerName}</p>
+                        <p>เบอร์โทร: {booking.customerContact}</p>
+                        <button
+                          className="btn btn-success mt-2"
+                          onClick={() => handleConfirmSingleBooking(booking)}
+                        >
+                          Confirm Booking
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No bookings in cart.</p>
+                  )}
+                  <button
+                    className="btn btn-success"
+                    onClick={handleConfirmAllBookings}
+                  >
+                    Confirm All Bookings
+                  </button>
+                  <button
+                    className="btn btn-secondary ml-2"
+                    onClick={() => setStep(1)}
+                  >
+                    Back to Booking
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
