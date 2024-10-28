@@ -74,7 +74,7 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile />,
-  }
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
