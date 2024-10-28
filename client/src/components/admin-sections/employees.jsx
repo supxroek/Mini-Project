@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { useForm } from "react-hook-form";
 
 const Employees = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -10,66 +12,82 @@ const Employees = () => {
   const [departments, setDepartments] = useState([]); // State for departments
   const [roles, setRoles] = useState([]); // State for roles
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    fname: "",
+    lname: "",
+    email: "",
+    pnumber: "",
+    password: "",
+    confirmPassword: "",
+    position_id: "",
+    department_id: "",
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+  } = useForm();
+
+  const password = watch("password"); // ใช้ watch เพื่อตรวจสอบรหัสผ่าน
+
+  const handleCreate = async () => {
+    // ส่งข้อมูลไปยัง API
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        newEmployee
+      );
+      if (response.status === 201) {
+        // ทำการรีเซ็ตข้อมูลและปิดโมดัล
+        reset();
+        setIsCreateModalOpen(false);
+        alert("Employee created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      alert("Failed to create employee.");
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    const fetchEmployees = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/list-employees"
-        );
-        const data = await response.json();
-        setEmployees(data.employees);
+        const [
+          employeeResponse,
+          positionResponse,
+          departmentResponse,
+          roleResponse,
+        ] = await Promise.all([
+          fetch("http://localhost:5000/api/auth/list-employees"),
+          fetch("http://localhost:5000/api/auth/list-positions"),
+          fetch("http://localhost:5000/api/auth/list-departments"),
+          fetch("http://localhost:5000/api/auth/list-roles"),
+        ]);
+
+        const employeeData = await employeeResponse.json();
+        const positionData = await positionResponse.json();
+        const departmentData = await departmentResponse.json();
+        const roleData = await roleResponse.json();
+
+        setEmployees(employeeData.employees);
+        setPositions(positionData.positions);
+        setDepartments(departmentData.departments);
+        setRoles(roleData.roles);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchPositions = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/list-positions"
-        );
-        const data = await response.json();
-        setPositions(data.positions);
-      } catch (error) {
-        console.error("Error fetching positions:", error);
-      }
-    };
-
-    const fetchDepartments = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/list-departments"
-        );
-        const data = await response.json();
-        setDepartments(data.departments);
-      } catch (error) {
-        console.error("Error fetching departments:", error);
-      }
-    };
-
-    const fetchRoles = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/list-roles"
-        );
-        const data = await response.json();
-        setRoles(data.roles);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
-    fetchEmployees();
-    fetchPositions();
-    fetchDepartments();
-    fetchRoles();
-
+    fetchData();
     return () => clearInterval(interval);
   }, []);
 
@@ -292,12 +310,9 @@ const Employees = () => {
         <div className="min-h-screen bg-base-200">
           <div className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h1 className="text-2xl font-semibold">Employees</h1>
+              <h1>Employees</h1>
               <button
-                onClick={() => {
-                  setSelectedEmployee(null);
-                  setIsModalOpen(true); // Open modal for new employee
-                }}
+                onClick={() => setIsCreateModalOpen(true)}
                 className="btn btn-primary"
               >
                 Create Employee
@@ -364,6 +379,221 @@ const Employees = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Modal Create Employee */}
+            {isCreateModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <h2 className="text-xl">Create Employee</h2>
+                  <form onSubmit={handleSubmit(handleCreate)}>
+                    <div className="form-control mb-2">
+                      <label className="label">First Name</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("fname", {
+                          required: "First name is required",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            fname: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.fname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.fname.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Last Name</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("lname", {
+                          required: "Last name is required",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            lname: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.lname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.lname.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Email</label>
+                      <input
+                        type="email"
+                        className="input input-bordered"
+                        {...register("email", {
+                          required: "Email is required",
+                          pattern: {
+                            value: /^\S+@\S+$/i,
+                            message: "Invalid email address",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            email: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.email && (
+                        <span className="text-red-500 text-sm">
+                          {errors.email.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Phone Number</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("pnumber", {
+                          required: "Phone number is required",
+                          pattern: {
+                            value: /^[0-9]{10}$/,
+                            message: "Invalid phone number",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            pnumber: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.pnumber && (
+                        <span className="text-red-500 text-sm">
+                          {errors.pnumber.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Password</label>
+                      <input
+                        type="password"
+                        className="input input-bordered"
+                        {...register("password", {
+                          required: "Password is required",
+                          minLength: {
+                            value: 6,
+                            message: "Password must be at least 6 characters",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            password: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.password && (
+                        <span className="text-red-500 text-sm">
+                          {errors.password.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Confirm Password</label>
+                      <input
+                        type="password"
+                        className="input input-bordered"
+                        {...register("confirmPassword", {
+                          required: "Please confirm password",
+                          validate: (value) =>
+                            value === password || "Passwords do not match",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.confirmPassword && (
+                        <span className="text-red-500 text-sm">
+                          {errors.confirmPassword.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div className="form-control">
+                        <label className="label">Position</label>
+                        <select
+                          className="select select-bordered"
+                          {...register("position_id", {
+                            required: "Position is required",
+                          })}
+                        >
+                          <option value="">Select Position</option>
+                          {positions.map((position) => (
+                            <option key={position.id} value={position.id}>
+                              {position.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.position_id && (
+                          <span className="text-red-500 text-sm">
+                            {errors.position_id.message}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">Department</label>
+                        <select
+                          className="select select-bordered"
+                          {...register("department_id", {
+                            required: "Department is required",
+                          })}
+                        >
+                          <option value="">Select Department</option>
+                          {departments.map((department) => (
+                            <option key={department.id} value={department.id}>
+                              {department.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.department_id && (
+                          <span className="text-red-500 text-sm">
+                            {errors.department_id.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="modal-action">
+                      <button type="submit" className="btn btn-primary">
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateModalOpen(false)}
+                        className="btn"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
 
             {/* Edit Modal */}
             {isModalOpen && (
