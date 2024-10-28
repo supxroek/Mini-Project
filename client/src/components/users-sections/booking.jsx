@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const rooms = [
   {
@@ -43,6 +44,15 @@ const Booking = () => {
 
   const handleRoomSelection = (room) => {
     setSelectedRoom(room);
+  };
+
+  const navigate = useNavigate();
+  // Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("bookingCount");
+    localStorage.removeItem("missedBookingCount");
+    navigate("/login");
   };
 
   const handleConfirmBooking = () => {
@@ -218,7 +228,9 @@ const Booking = () => {
                   className="card card-compact dropdown-content bg-gray-700 z-[1] mt-3 w-52 shadow"
                 >
                   <div className="card-body">
-                    <span className="text-lg font-bold text-white">{cart.length} Items</span>
+                    <span className="text-lg font-bold text-white">
+                      {cart.length} Items
+                    </span>
                     <div className="card-actions">
                       <button
                         className="btn btn-primary btn-block"
@@ -247,13 +259,14 @@ const Booking = () => {
                   className="dropdown-content menu p-2 shadow bg-gray-700 rounded-box w-52"
                 >
                   <li>
-                    <a className="text-white">Profile</a>
+                    <a href="/profile" className="text-white">
+                      Profile
+                    </a>
                   </li>
                   <li>
-                    <a className="text-white">Settings</a>
-                  </li>
-                  <li>
-                    <a className="text-white">Logout</a>
+                    <button onClick={handleLogout} className="text-white">
+                      Logout
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -263,7 +276,9 @@ const Booking = () => {
           <div className="p-8">
             {step === 1 && (
               <div>
-                <h2 className="text-xl mb-4">กรุณาเลือกวันและเวลาที่ต้องการจอง</h2>
+                <h2 className="text-xl mb-4">
+                  กรุณาเลือกวันและเวลาที่ต้องการจอง
+                </h2>
                 <input
                   type="date"
                   value={date}
@@ -389,4 +404,3 @@ const Booking = () => {
 };
 
 export default Booking;
- 
