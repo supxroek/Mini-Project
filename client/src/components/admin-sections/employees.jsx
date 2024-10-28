@@ -4,8 +4,11 @@ const Employees = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [positions, setPositions] = useState([]); // State for positions
+  const [departments, setDepartments] = useState([]); // State for departments
+  const [roles, setRoles] = useState([]); // State for roles
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,13 +29,53 @@ const Employees = () => {
       }
     };
 
+    const fetchPositions = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/auth/list-positions"
+        );
+        const data = await response.json();
+        setPositions(data.positions);
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+      }
+    };
+
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/auth/list-departments"
+        );
+        const data = await response.json();
+        setDepartments(data.departments);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/auth/list-roles"
+        );
+        const data = await response.json();
+        setRoles(data.roles);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
     fetchEmployees();
+    fetchPositions();
+    fetchDepartments();
+    fetchRoles();
+
     return () => clearInterval(interval);
   }, []);
 
   const handleEdit = (employee) => {
-    setEditMode(true);
     setSelectedEmployee(employee);
+    setIsModalOpen(true); // Open modal on edit
   };
 
   const handleSave = async () => {
@@ -50,9 +93,9 @@ const Employees = () => {
             lname: selectedEmployee.lname,
             email: selectedEmployee.email,
             pnumber: selectedEmployee.pnumber,
-            position_id: selectedEmployee.position_id,
-            department_id: selectedEmployee.department_id,
-            role_id: selectedEmployee.role_id,
+            position_name: selectedEmployee.position_name,
+            department_name: selectedEmployee.department_name,
+            role_name: selectedEmployee.role_name,
           }),
         }
       );
@@ -61,15 +104,15 @@ const Employees = () => {
         throw new Error("Failed to update employee");
       }
 
-      // อัปเดตข้อมูลใน State
+      // Update state
       setEmployees((prev) =>
         prev.map((emp) =>
           emp.id === selectedEmployee.id ? selectedEmployee : emp
         )
       );
 
-      setEditMode(false);
       setSelectedEmployee(null);
+      setIsModalOpen(false); // Close modal after saving
     } catch (error) {
       console.error("Error saving employee:", error);
     }
@@ -89,9 +132,8 @@ const Employees = () => {
   const handleLockUser = async (id) => {
     try {
       await fetch(`http://localhost:5000/api/auth/lock-employee/${id}`, {
-        method: "PATCH", // ใช้ PATCH สำหรับการล็อกผู้ใช้
+        method: "PATCH", // Use PATCH for locking user
       });
-      // อัปเดตข้อมูลใน State หากจำเป็น
       setEmployees((prev) =>
         prev.map((employee) =>
           employee.id === id ? { ...employee, locked: true } : employee
@@ -247,186 +289,229 @@ const Employees = () => {
         </div>
 
         {/* Main Content */}
-        <div className="p-4">
-          <h1 className="text-2xl font-semibold mb-4">Employees</h1>
-          <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>Employee ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                  <th>Phone Number</th>
-                  <th>Position ID</th>
-                  <th>Department ID</th>
-                  <th>Role ID</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+        <div className="min-h-screen bg-base-200">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-semibold">Employees</h1>
+              <button
+                onClick={() => {
+                  setSelectedEmployee(null);
+                  setIsModalOpen(true); // Open modal for new employee
+                }}
+                className="btn btn-primary"
+              >
+                Create Employee
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
                   <tr>
-                    <td colSpan="9" className="text-center">
-                      Loading...
-                    </td>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Position ID</th>
+                    <th>Department ID</th>
+                    <th>Role ID</th>
+                    <th>Actions</th>
                   </tr>
-                ) : (
-                  employees.map((employee) => (
-                    <tr key={employee.id}>
-                      <td>{employee.id}</td>
-                      <td>{employee.fname}</td>
-                      <td>{employee.lname}</td>
-                      <td>{employee.email}</td>
-                      <td>{employee.pnumber}</td>
-                      <td>{employee.position_id}</td>
-                      <td>{employee.department_id}</td>
-                      <td>{employee.role_id}</td>
-                      <td>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(employee)}
-                            className="btn btn-sm btn-ghost"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleLockUser(employee.id)}
-                            className="btn btn-sm btn-warning"
-                          >
-                            Lock User
-                          </button>
-                          <button
-                            onClick={() => handleDelete(employee.id)}
-                            className="btn btn-sm btn-error"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="9" className="text-center">
+                        Loading...
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    employees.map((employee) => (
+                      <tr key={employee.id}>
+                        <td>{employee.id}</td>
+                        <td>{employee.fname}</td>
+                        <td>{employee.lname}</td>
+                        <td>{employee.email}</td>
+                        <td>{employee.pnumber}</td>
+                        <td>{employee.position_name}</td>
+                        <td>{employee.department_name}</td>
+                        <td>{employee.role_name}</td>
+                        <td>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEdit(employee)}
+                              className="btn btn-sm btn-ghost"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleLockUser(employee.id)}
+                              className="btn btn-sm btn-warning"
+                            >
+                              Lock User
+                            </button>
+                            <button
+                              onClick={() => handleDelete(employee.id)}
+                              className="btn btn-sm btn-error"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-          {editMode && selectedEmployee && (
-            <div className="edit-form mt-6">
-              <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-              <div className="space-y-4">
-                <div>
-                  <label>First Name:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.fname}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        fname: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Last Name:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.lname}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        lname: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    value={selectedEmployee.email}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        email: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.pnumber}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        pnumber: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Position ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.position_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        position_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Department ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.department_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        department_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Role ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.role_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        role_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div className="flex space-x-2">
-                  <button onClick={handleSave} className="btn btn-primary mt-4">
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditMode(false)}
-                    className="btn btn-ghost mt-4"
-                  >
-                    Cancel
-                  </button>
+            {/* Edit Modal */}
+            {isModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <h2 className="font-semibold text-xl">Edit Employee</h2>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">First Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.fname}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          fname: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Last Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.lname}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          lname: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Email</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.email}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          email: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Phone Number</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.pnumber}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          pnumber: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Position</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.position_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          position_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {positions.map((position) => (
+                        <option key={position.id} value={position.name}>
+                          {position.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Department</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.department_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          department_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {departments.map((department) => (
+                        <option key={department.id} value={department.name}>
+                          {department.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Role</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.role_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          role_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {roles.map((role) => (
+                        <option key={role.id} value={role.name}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="modal-action">
+                    <button className="btn" onClick={handleSave}>
+                      Save
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

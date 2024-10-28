@@ -2,8 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const SignUp = () => {
+const Register = () => {
   const {
     register,
     handleSubmit,
@@ -14,8 +15,31 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [positions, setPositions] = useState([]); // State สำหรับตำแหน่ง
+  const [departments, setDepartments] = useState([]); // State สำหรับแผนก
 
   const navigate = useNavigate(); // เรียกใช้ useNavigate
+
+  useEffect(() => {
+    const fetchPositionsAndDepartments = async () => {
+      try {
+        const positionsResponse = await axios.get(
+          "http://localhost:5000/api/auth/list-positions"
+        );
+        const departmentsResponse = await axios.get(
+          "http://localhost:5000/api/auth/list-departments"
+        );
+
+        setPositions(positionsResponse.data.positions); // บันทึกตำแหน่ง
+        setDepartments(departmentsResponse.data.departments); // บันทึกแผนก
+      } catch (err) {
+        console.error("Error fetching positions or departments:", err);
+        setError("Failed to load positions or departments.");
+      }
+    };
+
+    fetchPositionsAndDepartments(); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูล
+  }, []);
 
   const onSubmit = async (data) => {
     setError("");
@@ -173,11 +197,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Position</option>
-                  <option value="1">Employee</option>
-                  <option value="2">Manager</option>
-                  <option value="3">Deputy Director</option>
-                  <option value="4">Executive</option>
-                  <option value="5">Senior Executives</option>
+                  {positions.map((position) => (
+                    <option key={position.id} value={position.id}>
+                      {position.name}
+                    </option>
+                  ))}
                 </select>
                 {errors.position_id && (
                   <span className="text-red-500 text-sm">
@@ -195,11 +219,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Department</option>
-                  <option value="1">Personnel</option>
-                  <option value="2">Human Resources</option>
-                  <option value="3">Accounting</option>
-                  <option value="4">Sales</option>
-                  <option value="5">Engineering</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
                 </select>
                 {errors.department_id && (
                   <span className="text-red-500 text-sm">
@@ -239,4 +263,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Register;
