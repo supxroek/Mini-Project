@@ -3,6 +3,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import Swal from "sweetalert2"; // import sweetalert2
 
 const Register = () => {
   const {
@@ -42,42 +43,63 @@ const Register = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    setError("");
     try {
       setLoading(true);
       const response = await axios.post(
         "http://localhost:5000/api/auth/register",
         data
       );
-
       if (response.status === 201) {
-        setMessage("Registration successful!");
-        reset(); // เคลียร์ฟอร์ม
-        setTimeout(() => {
-          navigate("/login"); // Redirect ไปหน้า SignIn หลังจากสมัครสำเร็จ
-        }, 2000); // กำหนดเวลารอ 2 วินาทีก่อน redirect
+        Swal.fire("Success", "Registration successful!", "success").then(() => {
+          reset();
+          navigate("/login");
+        });
       } else {
-        setError("Registration failed!");
+        Swal.fire("Error", "Registration failed!", "error");
       }
-      setLoading(false);
     } catch (error) {
-      console.error("Error details:", error);
-      setError(error.response?.data?.message || "An error occurred!");
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "An error occurred!",
+        "error"
+      );
+    } finally {
       setLoading(false);
     }
   };
 
   const password = watch("password");
 
+  // Inline styles for the animated background
+  const backgroundStyle = {
+    backgroundImage:
+      'url("https://images.pexels.com/photos/1292998/pexels-photo-1292998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")', // Replace with your image URL
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: -1,
+    animation: "moveBackground 30s linear infinite",
+  };
+
+  // Keyframes for background animation
+  const keyframes = `
+    @keyframes moveBackground {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 100%; }
+    }
+  `;
+
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
-      style={{
-        backgroundImage: "url('url_to_your_image')", // Change this to your image URL
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="min-h-screen bg-gray-200 flex justify-center items-center"
+      style={backgroundStyle}
     >
+      <style>{keyframes}</style>
       <div className="card w-500 max-w-lg bg-base-100 shadow-xl p-6">
         <div className="card-body">
           <h2 className="card-title text-center mb-4 text-2xl">Sign Up</h2>
