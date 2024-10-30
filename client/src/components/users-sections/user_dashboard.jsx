@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const User_dashboard = () => {
+const UserDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [bookingCount, setBookingCount] = useState(0);
   const [missedBookingCount, setMissedBookingCount] = useState(0);
@@ -66,7 +66,7 @@ const User_dashboard = () => {
   });
 
   return (
-    <div className="flex bg-gray-700">
+    <div className="flex bg-white">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
@@ -180,20 +180,14 @@ const User_dashboard = () => {
           </div>
         </div>
 
-        <div className="min-h-screen bg-gray-300">
+        <div className="min-h-screen bg-white flex justify-center items-center">
           {/* Main Content */}
-          <div className="p-6">
+          <div className="p-6 text-center">
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-            <p className="text-gray-800">Bookings: {bookingCount}</p>
-            <p className="text-gray-800">
+            <p className="text-gray-800 text-2xl">Bookings: {bookingCount}</p>
+            <p className="text-gray-800 text-2xl">
               Missed Bookings: {missedBookingCount}
             </p>
-            <button
-              onClick={handleBooking}
-              className="btn btn-primary text-white m-2 bg-gray-600 hover:bg-gray-500"
-            >
-              Book Now
-            </button>
             <button
               onClick={handleContactSupport}
               className="btn btn-info text-white m-2 bg-gray-600 hover:bg-gray-500"
@@ -207,4 +201,4 @@ const User_dashboard = () => {
   );
 };
 
-export default User_dashboard;
+export default UserDashboard;

@@ -6,7 +6,7 @@ const History = () => {
   const [bookingHistory, setBookingHistory] = useState([
     {
       id: 1,
-      roomImage: "/path/to/room1.jpg", // Replace with generated images
+      roomImage: "https://images.pexels.com/photos/6899396/pexels-photo-6899396.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1", // Replace with generated images
       roomName: "ห้อง VIP",
       customerName: "John Doe",
       bookingDate: "2024-10-25",
@@ -16,7 +16,7 @@ const History = () => {
     },
     {
       id: 2,
-      roomImage: "/path/to/room2.jpg", // Replace with generated images
+      roomImage: "https://images.pexels.com/photos/2976970/pexels-photo-2976970.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1", // Replace with generated images
       roomName: "ห้องธรรมดา",
       customerName: "Jane Smith",
       bookingDate: "2024-10-20",
