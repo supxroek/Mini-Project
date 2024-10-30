@@ -61,7 +61,7 @@ const Profile = () => {
   return (
     <div className="flex bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-700 min-h-screen p-4 text-white flex flex-col justify-between">
+      <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">

@@ -26,7 +26,7 @@ function Home() {
 
   return (
     <>
-      <animated.div style={{ ...heroAnimation, backgroundImage: 'url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)', ...bgAnimation, backgroundSize: 'cover' }} className="hero min-h-screen bg-gray-800">
+      <animated.div style={{ ...heroAnimation, backgroundImage: 'url(https://images.pexels.com/photos/1292998/pexels-photo-1292998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)', ...bgAnimation, backgroundSize: 'cover' }} className="hero min-h-screen bg-gray-800">
         <div className="hero-overlay bg-opacity-60"></div>
         <div className="hero-content text-gray-200 text-center">
           <div className="max-w-md">
