@@ -2,8 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Swal from "sweetalert2"; // import sweetalert2
 
-const SignUp = () => {
+const Register = () => {
   const {
     register,
     handleSubmit,
@@ -12,41 +14,92 @@ const SignUp = () => {
     reset,
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message] = useState("");
   const [error, setError] = useState("");
+  const [positions, setPositions] = useState([]); // State สำหรับตำแหน่ง
+  const [departments, setDepartments] = useState([]); // State สำหรับแผนก
 
   const navigate = useNavigate(); // เรียกใช้ useNavigate
 
+  useEffect(() => {
+    const fetchPositionsAndDepartments = async () => {
+      try {
+        const positionsResponse = await axios.get(
+          "http://localhost:5000/api/auth/list-positions"
+        );
+        const departmentsResponse = await axios.get(
+          "http://localhost:5000/api/auth/list-departments"
+        );
+
+        setPositions(positionsResponse.data.positions); // บันทึกตำแหน่ง
+        setDepartments(departmentsResponse.data.departments); // บันทึกแผนก
+      } catch (err) {
+        console.error("Error fetching positions or departments:", err);
+        setError("Failed to load positions or departments.");
+      }
+    };
+
+    fetchPositionsAndDepartments(); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูล
+  }, []);
+
   const onSubmit = async (data) => {
-    setError("");
     try {
       setLoading(true);
       const response = await axios.post(
         "http://localhost:5000/api/auth/register",
         data
       );
-
       if (response.status === 201) {
-        setMessage("Registration successful!");
-        reset(); // เคลียร์ฟอร์ม
-        setTimeout(() => {
-          navigate("/login"); // Redirect ไปหน้า SignIn หลังจากสมัครสำเร็จ
-        }, 2000); // กำหนดเวลารอ 2 วินาทีก่อน redirect
+        Swal.fire("Success", "Registration successful!", "success").then(() => {
+          reset();
+          navigate("/login");
+        });
       } else {
-        setError("Registration failed!");
+        Swal.fire("Error", "Registration failed!", "error");
       }
-      setLoading(false);
     } catch (error) {
-      console.error("Error details:", error);
-      setError(error.response?.data?.message || "An error occurred!");
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "An error occurred!",
+        "error"
+      );
+    } finally {
       setLoading(false);
     }
   };
 
   const password = watch("password");
 
+  // Inline styles for the animated background
+  const backgroundStyle = {
+    backgroundImage:
+      'url("https://images.pexels.com/photos/1292998/pexels-photo-1292998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")', // Replace with your image URL
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: -1,
+    animation: "moveBackground 30s linear infinite",
+  };
+
+  // Keyframes for background animation
+  const keyframes = `
+    @keyframes moveBackground {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 100%; }
+    }
+  `;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
+    <div
+      className="min-h-screen bg-gray-200 flex justify-center items-center"
+      style={backgroundStyle}
+    >
+      <style>{keyframes}</style>
       <div className="card w-500 max-w-lg bg-base-100 shadow-xl p-6">
         <div className="card-body">
           <h2 className="card-title text-center mb-4 text-2xl">Sign Up</h2>
@@ -173,11 +226,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Position</option>
-                  <option value="1">Employee</option>
-                  <option value="2">Manager</option>
-                  <option value="3">Deputy Director</option>
-                  <option value="4">Executive</option>
-                  <option value="5">Senior Executives</option>
+                  {positions.map((position) => (
+                    <option key={position.id} value={position.id}>
+                      {position.name}
+                    </option>
+                  ))}
                 </select>
                 {errors.position_id && (
                   <span className="text-red-500 text-sm">
@@ -195,11 +248,11 @@ const SignUp = () => {
                   })}
                 >
                   <option value="">Select Department</option>
-                  <option value="1">Personnel</option>
-                  <option value="2">Human Resources</option>
-                  <option value="3">Accounting</option>
-                  <option value="4">Sales</option>
-                  <option value="5">Engineering</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
                 </select>
                 {errors.department_id && (
                   <span className="text-red-500 text-sm">
@@ -239,4 +292,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Register;

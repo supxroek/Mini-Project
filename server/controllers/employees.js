@@ -8,7 +8,16 @@ const connectDB = require("../config/database");
 exports.getEmployees = async (req, res) => {
   try {
     const connection = await connectDB();
-    const result = await connection.execute(`SELECT * FROM employees`);
+    const result = await connection.execute(`
+      SELECT e.EMPLOYEE_ID, e.FNAME, e.LNAME, e.EMAIL, e.PNUMBER,
+             p.POSITION_NAME AS position_name,
+             d.DEPARTMENT_NAME AS department_name,
+             r.ROLE_NAME AS role_name
+      FROM employees e
+      JOIN POSITIONS p ON e.POSITION_ID = p.POSITION_ID
+      JOIN DEPARTMENTS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+      JOIN ROLES r ON e.ROLE_ID = r.ROLE_ID
+    `);
     await connection.close();
 
     const employees = result.rows.map((row) => {
@@ -18,9 +27,9 @@ exports.getEmployees = async (req, res) => {
         lname: row[2], // นามสกุล
         email: row[3], // อีเมล
         pnumber: row[4], // เบอร์โทรศัพท์
-        position_id: row[7], // รหัสตำแหน่ง
-        department_id: row[8], // รหัสแผนก
-        role_id: row[9], // รหัสบทบาท
+        position_name: row[5], // ชื่อตำแหน่ง
+        department_name: row[6], // ชื่อแผนก
+        role_name: row[7], // ชื่อบทบาท
       };
     });
 
@@ -114,5 +123,54 @@ exports.deleteEmployee = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting employee", error: err.message });
+  }
+};
+
+// สร้างข้อมูลพนักงาน
+// Create employee
+exports.createEmployee = async (req, res) => {
+  const {
+    fname,
+    lname,
+    email,
+    password,
+    pnumber,
+    position_id,
+    department_id,
+    role_id,
+  } = req.body;
+
+  try {
+    const connection = await connectDB();
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const createQuery = `
+      INSERT INTO employees (fname, lname, email, password, pnumber, position_id, department_id, role_id)
+      VALUES (:fname, :lname, :email, :password, :pnumber, :position_id, :department_id, :role_id)
+    `;
+
+    const params = {
+      fname,
+      lname,
+      email,
+      password: hashedPassword,
+      pnumber,
+      position_id,
+      department_id,
+      role_id,
+    };
+
+    const result = await connection.execute(createQuery, params, {
+      autoCommit: true,
+    });
+
+    await connection.close();
+
+    res.status(201).json({ message: "Employee created successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error creating employee", error: err.message });
   }
 };

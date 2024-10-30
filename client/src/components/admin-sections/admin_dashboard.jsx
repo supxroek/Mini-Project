@@ -63,7 +63,7 @@ const Admin_dashboard = () => {
     <>
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+        <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
@@ -244,7 +244,7 @@ const Admin_dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="min-h-screen bg-base-200">
+          <div className="min-h-screen bg-gray-300">
             {/* Main Content */}
             <div className="p-6">
               <h1 className="text-2xl font-bold mb-4">Dashboard</h1>

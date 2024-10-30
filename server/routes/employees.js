@@ -3,7 +3,7 @@ const {
   getEmployees,
   updateEmployee,
   deleteEmployee,
-} = require("../controllers/Employees");
+} = require("../controllers/employees");
 const router = express.Router();
 
 // Get all employees

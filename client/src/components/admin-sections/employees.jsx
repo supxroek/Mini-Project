@@ -1,38 +1,118 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { useForm } from "react-hook-form";
 
 const Employees = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [positions, setPositions] = useState([]); // State for positions
+  const [departments, setDepartments] = useState([]); // State for departments
+  const [roles, setRoles] = useState([]); // State for roles
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    fname: "",
+    lname: "",
+    email: "",
+    pnumber: "",
+    password: "",
+    confirmPassword: "",
+    position_id: "",
+    department_id: "",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+  } = useForm();
+
+  const password = watch("password"); // ใช้ watch เพื่อตรวจสอบรหัสผ่าน
+
+  const handleCreate = async (data) => {
+    // อัพเดตค่าของ newEmployee
+    setNewEmployee({
+      fname: data.fname,
+      lname: data.lname,
+      email: data.email,
+      pnumber: data.pnumber,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      position_id: data.position_id || watch("position_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+      department_id: data.department_id || watch("department_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+      role_id: data.role_id || watch("role_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+    });
+
+    // ส่งข้อมูลไปยัง API
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        {
+          ...data,
+          position_id: data.position_id || watch("position_id"),
+          department_id: data.department_id || watch("department_id"),
+          role_id: data.role_id || watch("role_id"),
+        }
+      );
+      if (response.status === 201) {
+        // ทำการรีเซ็ตข้อมูลและปิดโมดัล
+        reset();
+        setIsCreateModalOpen(false);
+        alert("Employee created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      alert("Failed to create employee.");
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    const fetchEmployees = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/list-employees"
-        );
-        const data = await response.json();
-        setEmployees(data.employees);
+        const [
+          employeeResponse,
+          positionResponse,
+          departmentResponse,
+          roleResponse,
+        ] = await Promise.all([
+          fetch("http://localhost:5000/api/auth/list-employees"),
+          fetch("http://localhost:5000/api/auth/list-positions"),
+          fetch("http://localhost:5000/api/auth/list-departments"),
+          fetch("http://localhost:5000/api/auth/list-roles"),
+        ]);
+
+        const employeeData = await employeeResponse.json();
+        const positionData = await positionResponse.json();
+        const departmentData = await departmentResponse.json();
+        const roleData = await roleResponse.json();
+
+        setEmployees(employeeData.employees);
+        setPositions(positionData.positions);
+        setDepartments(departmentData.departments);
+        setRoles(roleData.roles);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEmployees();
+    fetchData();
     return () => clearInterval(interval);
   }, []);
 
   const handleEdit = (employee) => {
-    setEditMode(true);
     setSelectedEmployee(employee);
+    setIsModalOpen(true); // Open modal on edit
   };
 
   const handleSave = async () => {
@@ -50,9 +130,9 @@ const Employees = () => {
             lname: selectedEmployee.lname,
             email: selectedEmployee.email,
             pnumber: selectedEmployee.pnumber,
-            position_id: selectedEmployee.position_id,
-            department_id: selectedEmployee.department_id,
-            role_id: selectedEmployee.role_id,
+            position_name: selectedEmployee.position_name,
+            department_name: selectedEmployee.department_name,
+            role_name: selectedEmployee.role_name,
           }),
         }
       );
@@ -61,15 +141,15 @@ const Employees = () => {
         throw new Error("Failed to update employee");
       }
 
-      // อัปเดตข้อมูลใน State
+      // Update state
       setEmployees((prev) =>
         prev.map((emp) =>
           emp.id === selectedEmployee.id ? selectedEmployee : emp
         )
       );
 
-      setEditMode(false);
       setSelectedEmployee(null);
+      setIsModalOpen(false); // Close modal after saving
     } catch (error) {
       console.error("Error saving employee:", error);
     }
@@ -89,9 +169,8 @@ const Employees = () => {
   const handleLockUser = async (id) => {
     try {
       await fetch(`http://localhost:5000/api/auth/lock-employee/${id}`, {
-        method: "PATCH", // ใช้ PATCH สำหรับการล็อกผู้ใช้
+        method: "PATCH", // Use PATCH for locking user
       });
-      // อัปเดตข้อมูลใน State หากจำเป็น
       setEmployees((prev) =>
         prev.map((employee) =>
           employee.id === id ? { ...employee, locked: true } : employee
@@ -111,7 +190,7 @@ const Employees = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+      <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">
@@ -247,186 +326,441 @@ const Employees = () => {
         </div>
 
         {/* Main Content */}
-        <div className="p-4">
-          <h1 className="text-2xl font-semibold mb-4">Employees</h1>
-          <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>Employee ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                  <th>Phone Number</th>
-                  <th>Position ID</th>
-                  <th>Department ID</th>
-                  <th>Role ID</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+        <div className="min-h-screen bg-gray-300">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h1>Employees</h1>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="btn btn-primary"
+              >
+                Create Employee
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
                   <tr>
-                    <td colSpan="9" className="text-center">
-                      Loading...
-                    </td>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Position ID</th>
+                    <th>Department ID</th>
+                    <th>Role ID</th>
+                    <th>Actions</th>
                   </tr>
-                ) : (
-                  employees.map((employee) => (
-                    <tr key={employee.id}>
-                      <td>{employee.id}</td>
-                      <td>{employee.fname}</td>
-                      <td>{employee.lname}</td>
-                      <td>{employee.email}</td>
-                      <td>{employee.pnumber}</td>
-                      <td>{employee.position_id}</td>
-                      <td>{employee.department_id}</td>
-                      <td>{employee.role_id}</td>
-                      <td>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(employee)}
-                            className="btn btn-sm btn-ghost"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleLockUser(employee.id)}
-                            className="btn btn-sm btn-warning"
-                          >
-                            Lock User
-                          </button>
-                          <button
-                            onClick={() => handleDelete(employee.id)}
-                            className="btn btn-sm btn-error"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="9" className="text-center">
+                        Loading...
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    employees.map((employee) => (
+                      <tr key={employee.id}>
+                        <td>{employee.id}</td>
+                        <td>{employee.fname}</td>
+                        <td>{employee.lname}</td>
+                        <td>{employee.email}</td>
+                        <td>{employee.pnumber}</td>
+                        <td>{employee.position_name}</td>
+                        <td>{employee.department_name}</td>
+                        <td>{employee.role_name}</td>
+                        <td>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEdit(employee)}
+                              className="btn btn-sm btn-ghost"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleLockUser(employee.id)}
+                              className="btn btn-sm btn-warning"
+                            >
+                              Lock User
+                            </button>
+                            <button
+                              onClick={() => handleDelete(employee.id)}
+                              className="btn btn-sm btn-error"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-          {editMode && selectedEmployee && (
-            <div className="edit-form mt-6">
-              <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-              <div className="space-y-4">
-                <div>
-                  <label>First Name:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.fname}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        fname: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Last Name:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.lname}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        lname: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    value={selectedEmployee.email}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        email: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.pnumber}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        pnumber: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Position ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.position_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        position_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Department ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.department_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        department_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div>
-                  <label>Role ID:</label>
-                  <input
-                    type="text"
-                    value={selectedEmployee.role_id}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        role_id: e.target.value,
-                      })
-                    }
-                    className="input input-bordered w-full"
-                  />
-                </div>
-                <div className="flex space-x-2">
-                  <button onClick={handleSave} className="btn btn-primary mt-4">
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditMode(false)}
-                    className="btn btn-ghost mt-4"
-                  >
-                    Cancel
-                  </button>
+            {/* Modal Create Employee */}
+            {isCreateModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <h2 className="text-xl">Create Employee</h2>
+                  <form onSubmit={handleSubmit(handleCreate)}>
+                    <div className="form-control mb-2">
+                      <label className="label">First Name</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("fname", {
+                          required: "First name is required",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            fname: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.fname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.fname.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Last Name</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("lname", {
+                          required: "Last name is required",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            lname: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.lname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.lname.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Email</label>
+                      <input
+                        type="email"
+                        className="input input-bordered"
+                        {...register("email", {
+                          required: "Email is required",
+                          pattern: {
+                            value: /^\S+@\S+$/i,
+                            message: "Invalid email address",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            email: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.email && (
+                        <span className="text-red-500 text-sm">
+                          {errors.email.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Phone Number</label>
+                      <input
+                        type="text"
+                        className="input input-bordered"
+                        {...register("pnumber", {
+                          required: "Phone number is required",
+                          pattern: {
+                            value: /^[0-9]{10}$/,
+                            message: "Invalid phone number",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            pnumber: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.pnumber && (
+                        <span className="text-red-500 text-sm">
+                          {errors.pnumber.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Password</label>
+                      <input
+                        type="password"
+                        className="input input-bordered"
+                        {...register("password", {
+                          required: "Password is required",
+                          minLength: {
+                            value: 6,
+                            message: "Password must be at least 6 characters",
+                          },
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            password: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.password && (
+                        <span className="text-red-500 text-sm">
+                          {errors.password.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="form-control mb-2">
+                      <label className="label">Confirm Password</label>
+                      <input
+                        type="password"
+                        className="input input-bordered"
+                        {...register("confirmPassword", {
+                          required: "Please confirm password",
+                          validate: (value) =>
+                            value === password || "Passwords do not match",
+                        })}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.confirmPassword && (
+                        <span className="text-red-500 text-sm">
+                          {errors.confirmPassword.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div className="form-control">
+                        <label className="label">Position</label>
+                        <select
+                          className="select select-bordered"
+                          {...register("position_id", {
+                            required: "Position is required",
+                          })}
+                        >
+                          <option value="">Select Position</option>
+                          {positions.map((position) => (
+                            <option key={position.id} value={position.id}>
+                              {position.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.position_id && (
+                          <span className="text-red-500 text-sm">
+                            {errors.position_id.message}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">Department</label>
+                        <select
+                          className="select select-bordered"
+                          {...register("department_id", {
+                            required: "Department is required",
+                          })}
+                        >
+                          <option value="">Select Department</option>
+                          {departments.map((department) => (
+                            <option key={department.id} value={department.id}>
+                              {department.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.department_id && (
+                          <span className="text-red-500 text-sm">
+                            {errors.department_id.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="modal-action">
+                      <button type="submit" className="btn btn-primary">
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateModalOpen(false)}
+                        className="btn"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Edit Modal */}
+            {isModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <h2 className="font-semibold text-xl">Edit Employee</h2>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">First Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.fname}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          fname: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Last Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.lname}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          lname: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Email</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.email}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          email: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Phone Number</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEmployee.pnumber}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          pnumber: e.target.value,
+                        })
+                      }
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Position</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.position_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          position_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {positions.map((position) => (
+                        <option key={position.id} value={position.name}>
+                          {position.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Department</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.department_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          department_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {departments.map((department) => (
+                        <option key={department.id} value={department.name}>
+                          {department.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Role</span>
+                    </label>
+                    <select
+                      value={selectedEmployee.role_name}
+                      onChange={(e) =>
+                        setSelectedEmployee({
+                          ...selectedEmployee,
+                          role_name: e.target.value,
+                        })
+                      }
+                      className="select select-bordered"
+                    >
+                      {roles.map((role) => (
+                        <option key={role.id} value={role.name}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="modal-action">
+                    <button className="btn" onClick={handleSave}>
+                      Save
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
