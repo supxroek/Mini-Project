@@ -94,7 +94,7 @@ const Rooms = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+      <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">
@@ -253,7 +253,7 @@ const Rooms = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 z-[1] mt-3 p-2 shadow rounded-box w-52"
+                className="menu menu-sm dropdown-content bg-gray-300 z-[1] mt-3 p-2 shadow rounded-box w-52"
               >
                 <li>
                   <a className="justify-between">
