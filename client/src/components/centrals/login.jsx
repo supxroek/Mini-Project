@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // import sweetalert2
 
 const Login = () => {
   const {
@@ -11,18 +12,25 @@ const Login = () => {
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message] = useState("");
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:5000/api/auth/login", data);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        data
+      );
       const userRole = response.data.role;
 
-      setMessage("Login successful!");
-      console.log(response.data);
       setLoading(false);
+      Swal.fire({
+        icon: "success",
+        title: "Login successful!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
       setTimeout(() => {
         if (userRole === 1) {
@@ -34,14 +42,19 @@ const Login = () => {
         }
       }, 2000);
     } catch (error) {
-      setMessage(`Login failed: ${error.response?.data?.message || error.message}`);
       setLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Login failed",
+        text: error.response?.data?.message || error.message,
+      });
     }
   };
 
   // Inline styles for the animated background
   const backgroundStyle = {
-    backgroundImage: 'url("https://images.pexels.com/photos/1292998/pexels-photo-1292998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")', // Replace with your image URL
+    backgroundImage:
+      'url("https://images.pexels.com/photos/1292998/pexels-photo-1292998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")', // Replace with your image URL
     backgroundSize: "cover",
     backgroundPosition: "center",
     position: "fixed",
@@ -63,7 +76,10 @@ const Login = () => {
   `;
 
   return (
-    <div className="min-h-screen bg-gray-200 flex justify-center items-center" style={backgroundStyle}>
+    <div
+      className="min-h-screen bg-gray-200 flex justify-center items-center"
+      style={backgroundStyle}
+    >
       <style>{keyframes}</style>
       <div className="card w-96 bg-gray-100 shadow-lg z-10">
         <div className="card-body">
@@ -106,7 +122,9 @@ const Login = () => {
             <div className="form-control mt-4">
               <button
                 type="submit"
-                className={`btn btn-primary bg-gray-700 text-white ${loading ? "loading" : ""}`}
+                className={`btn btn-primary bg-gray-700 text-white ${
+                  loading ? "loading" : ""
+                }`}
                 disabled={loading}
               >
                 Login
@@ -120,7 +138,9 @@ const Login = () => {
                 </p>
               </div>
             </div>
-            {message && <p className="text-center mt-4 text-gray-600">{message}</p>}
+            {message && (
+              <p className="text-center mt-4 text-gray-600">{message}</p>
+            )}
           </form>
         </div>
       </div>

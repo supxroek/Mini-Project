@@ -14,7 +14,7 @@ const Register = () => {
     reset,
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message] = useState("");
   const [error, setError] = useState("");
   const [positions, setPositions] = useState([]); // State สำหรับตำแหน่ง
   const [departments, setDepartments] = useState([]); // State สำหรับแผนก
