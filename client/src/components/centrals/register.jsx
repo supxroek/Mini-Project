@@ -70,7 +70,14 @@ const Register = () => {
   const password = watch("password");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: "url('url_to_your_image')", // Change this to your image URL
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="card w-500 max-w-lg bg-base-100 shadow-xl p-6">
         <div className="card-body">
           <h2 className="card-title text-center mb-4 text-2xl">Sign Up</h2>
