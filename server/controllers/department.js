@@ -65,7 +65,8 @@ exports.createDepartment = async (req, res) => {
     const connection = await connectDB();
     const result = await connection.execute(
       `INSERT INTO departments (department_name) VALUES (:name)`,
-      [name]
+      [name],
+      { autoCommit: true }
     );
     await connection.commit();
     await connection.close();

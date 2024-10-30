@@ -23,6 +23,7 @@ const Employees = () => {
     position_id: "",
     department_id: "",
   });
+
   const {
     register,
     handleSubmit,
@@ -33,12 +34,30 @@ const Employees = () => {
 
   const password = watch("password"); // ใช้ watch เพื่อตรวจสอบรหัสผ่าน
 
-  const handleCreate = async () => {
+  const handleCreate = async (data) => {
+    // อัพเดตค่าของ newEmployee
+    setNewEmployee({
+      fname: data.fname,
+      lname: data.lname,
+      email: data.email,
+      pnumber: data.pnumber,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      position_id: data.position_id || watch("position_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+      department_id: data.department_id || watch("department_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+      role_id: data.role_id || watch("role_id"), // เก็บค่าเดิมถ้าไม่เปลี่ยนแปลง
+    });
+
     // ส่งข้อมูลไปยัง API
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/register",
-        newEmployee
+        {
+          ...data,
+          position_id: data.position_id || watch("position_id"),
+          department_id: data.department_id || watch("department_id"),
+          role_id: data.role_id || watch("role_id"),
+        }
       );
       if (response.status === 201) {
         // ทำการรีเซ็ตข้อมูลและปิดโมดัล
