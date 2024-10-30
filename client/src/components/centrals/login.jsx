@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
