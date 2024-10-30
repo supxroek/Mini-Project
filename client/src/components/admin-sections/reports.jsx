@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import { Bar } from "react-chartjs-2"; // นำเข้า Bar จาก react-chartjs-2
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+// ลงทะเบียน Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Reports = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -18,11 +23,38 @@ const Reports = () => {
     hour12: false, // ใช้รูปแบบเวลา 24 ชั่วโมง
   });
 
+  // ข้อมูลตัวอย่างสำหรับกราฟ (การเข้าใช้ในแต่ละเดือน)
+  const data = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'], // ชื่อเดือน
+    datasets: [
+      {
+        label: 'การเข้าใช้',
+        data: [65, 59, 80, 81, 56, 55, 40], // จำนวนการเข้าใช้ในแต่ละเดือน
+        backgroundColor: 'rgba(75, 192, 192, 0.2)', // สีพื้นหลัง
+        borderColor: 'rgba(75, 192, 192, 1)', // สีเส้นกราฟ
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'กราฟเปรียบเทียบการเข้าใช้ในแต่ละเดือน',
+      },
+    },
+  };
+
   return (
     <>
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
+        <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
@@ -203,10 +235,15 @@ const Reports = () => {
               </div>
             </div>
           </div>
-          <div className="min-h-screen bg-gray-300">
+
+          <div className="min-h-screen bg-base-200">
             {/* Main Content */}
             <div className="p-10">
               <h1 className="text-3xl font-semibold">Reports</h1>
+              {/* เพิ่มกราฟที่นี่ */}
+              <div className="mt-10">
+                <Bar data={data} options={options} /> {/* แสดงกราฟ */}
+              </div>
             </div>
           </div>
         </div>
