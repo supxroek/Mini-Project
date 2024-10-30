@@ -54,7 +54,7 @@ const Reports = () => {
     <>
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-indigo-600 min-h-screen p-4 text-white flex flex-col justify-between">
+        <aside className="w-64 bg-gray-800 min-h-screen p-4 text-white flex flex-col justify-between">
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
@@ -217,7 +217,7 @@ const Reports = () => {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+                  className="menu menu-sm dropdown-content bg-gray-200 rounded-box z-[1] mt-3 w-52 p-2 shadow"
                 >
                   <li>
                     <a className="justify-between">
@@ -236,7 +236,7 @@ const Reports = () => {
             </div>
           </div>
 
-          <div className="min-h-screen bg-base-200">
+          <div className="min-h-screen bg-gray-300">
             {/* Main Content */}
             <div className="p-10">
               <h1 className="text-3xl font-semibold">Reports</h1>
