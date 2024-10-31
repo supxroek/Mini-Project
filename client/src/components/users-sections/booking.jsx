@@ -193,7 +193,6 @@ const Booking = () => {
               </div>
             </div>
           </div>
-
         </div>
 
         {step === 1 && (
