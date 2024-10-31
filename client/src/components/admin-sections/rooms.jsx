@@ -1,18 +1,46 @@
 import { useState, useEffect } from "react";
 
-// Component สำหรับจัดการห้อง
+// Component for managing rooms
 const RoomsManagement = () => {
   const [rooms, setRooms] = useState([
-    { id: 1, name: "Room A", locked: false },
-    { id: 2, name: "Room B", locked: false },
+    {
+      id: 1,
+      name: "Room A",
+      locked: false,
+      equipment: "Projector",
+      floor: 1,
+      building: "Main Building",
+      capacity: 20,
+      type: "Meeting Room"
+    },
+    {
+      id: 2,
+      name: "Room B",
+      locked: false,
+      equipment: "Whiteboard",
+      floor: 2,
+      building: "Annex Building",
+      capacity: 15,
+      type: "Classroom"
+    },
   ]);
   const [newRoomName, setNewRoomName] = useState("");
+  const [editingRoom, setEditingRoom] = useState(null);
 
   const addRoom = () => {
     if (newRoomName.trim()) {
       setRooms([
         ...rooms,
-        { id: rooms.length + 1, name: newRoomName, locked: false },
+        {
+          id: rooms.length + 1,
+          name: newRoomName,
+          locked: false,
+          equipment: "",
+          floor: "",
+          building: "",
+          capacity: "",
+          type: ""
+        },
       ]);
       setNewRoomName("");
     }
@@ -28,6 +56,23 @@ const RoomsManagement = () => {
         room.id === id ? { ...room, locked: !room.locked } : room
       )
     );
+  };
+
+  const startEditing = (room) => {
+    setEditingRoom({ ...room });
+  };
+
+  const saveRoomDetails = () => {
+    setRooms(
+      rooms.map((room) =>
+        room.id === editingRoom.id ? { ...editingRoom } : room
+      )
+    );
+    setEditingRoom(null);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditingRoom({ ...editingRoom, [field]: value });
   };
 
   return (
@@ -47,25 +92,99 @@ const RoomsManagement = () => {
       <ul>
         {rooms.map((room) => (
           <li key={room.id} className="flex items-center justify-between mb-2">
-            <span className={room.locked ? "line-through" : ""}>
-              {room.name}
-            </span>
-            <div>
-              <button
-                onClick={() => toggleLockRoom(room.id)}
-                className={`btn btn-sm mr-2 ${
-                  room.locked ? "btn-warning" : "btn-secondary"
-                }`}
-              >
-                {room.locked ? "Unlock" : "Lock"}
-              </button>
-              <button
-                onClick={() => deleteRoom(room.id)}
-                className="btn btn-sm btn-error"
-              >
-                Delete
-              </button>
-            </div>
+            {editingRoom && editingRoom.id === room.id ? (
+              <div className="mb-4 p-4 border rounded">
+                <h3 className="text-lg font-bold mb-2">Edit Room Details</h3>
+                <label className="block mb-2">
+                  Room Name:
+                  <input
+                    type="text"
+                    value={editingRoom.name}
+                    onChange={(e) => handleEditChange("name", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <label className="block mb-2">
+                  Equipment:
+                  <input
+                    type="text"
+                    value={editingRoom.equipment}
+                    onChange={(e) => handleEditChange("equipment", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <label className="block mb-2">
+                  Floor:
+                  <input
+                    type="number"
+                    value={editingRoom.floor}
+                    onChange={(e) => handleEditChange("floor", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <label className="block mb-2">
+                  Building:
+                  <input
+                    type="text"
+                    value={editingRoom.building}
+                    onChange={(e) => handleEditChange("building", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <label className="block mb-2">
+                  Capacity:
+                  <input
+                    type="number"
+                    value={editingRoom.capacity}
+                    onChange={(e) => handleEditChange("capacity", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <label className="block mb-2">
+                  Room Type:
+                  <input
+                    type="text"
+                    value={editingRoom.type}
+                    onChange={(e) => handleEditChange("type", e.target.value)}
+                    className="input input-bordered w-full mt-1"
+                  />
+                </label>
+                <button
+                  onClick={saveRoomDetails}
+                  className="btn btn-sm btn-success mr-2 mt-2"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <>
+                <span className={room.locked ? "line-through" : ""}>
+                  {room.name}
+                </span>
+                <div>
+                  <button
+                    onClick={() => startEditing(room)}
+                    className="btn btn-sm btn-info mr-2"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => toggleLockRoom(room.id)}
+                    className={`btn btn-sm mr-2 ${
+                      room.locked ? "btn-warning" : "btn-secondary"
+                    }`}
+                  >
+                    {room.locked ? "Unlock" : "Lock"}
+                  </button>
+                  <button
+                    onClick={() => deleteRoom(room.id)}
+                    className="btn btn-sm btn-error"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>
@@ -73,22 +192,22 @@ const RoomsManagement = () => {
   );
 };
 
-// Component สำหรับแสดงหน้า Rooms
+// Component for displaying Rooms page
 const Rooms = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); // อัปเดตทุกๆ วินาที
+    }, 1000);
 
-    return () => clearInterval(interval); // Cleanup เมื่อตัว component ถูกยกเลิก
+    return () => clearInterval(interval);
   }, []);
 
   const dayName = currentTime.toLocaleString("en-US", { weekday: "long" });
   const monthName = currentTime.toLocaleString("en-US", { month: "short" });
   const timeString = currentTime.toLocaleTimeString("en-US", {
-    hour12: false, // ใช้รูปแบบเวลา 24 ชั่วโมง
+    hour12: false,
   });
 
   return (
@@ -98,7 +217,7 @@ const Rooms = () => {
         <div className="flex flex-col">
           <a className="text-2xl font-semibold mb-6">Logo</a>
           <nav className="flex flex-col gap-3">
-            <a
+          <a
               href="/admin_dashboard"
               className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
             >
@@ -196,8 +315,8 @@ const Rooms = () => {
             </div>
           </div>
           <div className="navbar-end">
-            {/* Cart Dropdown */}
-            <div className="dropdown dropdown-end">
+           {/* Cart Dropdown */}
+           <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
                 role="button"
@@ -236,7 +355,6 @@ const Rooms = () => {
                 </div>
               </div>
             </div>
-
             {/* User Dropdown */}
             <div className="dropdown dropdown-end">
               <div
