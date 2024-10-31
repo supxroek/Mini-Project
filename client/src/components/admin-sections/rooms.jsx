@@ -9,7 +9,7 @@ const RoomsManagement = () => {
       locked: false,
       equipment: "Projector",
       floor: 1,
-      building: "Main Building",
+      building: "ตึก F",
       capacity: 20,
       type: "Meeting Room"
     },
@@ -19,7 +19,7 @@ const RoomsManagement = () => {
       locked: false,
       equipment: "Whiteboard",
       floor: 2,
-      building: "Annex Building",
+      building: "ตึก F",
       capacity: 15,
       type: "Classroom"
     },
