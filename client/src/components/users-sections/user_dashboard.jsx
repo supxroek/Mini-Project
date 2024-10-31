@@ -180,7 +180,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="min-h-screen bg-white flex justify-center items-center">
+        <div className="min-h-screen bg-gray-300 flex justify-center items-center">
           {/* Main Content */}
           <div className="p-6 text-center">
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
