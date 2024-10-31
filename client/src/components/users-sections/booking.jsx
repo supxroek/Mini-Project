@@ -10,7 +10,7 @@ const rooms = [
     facilities: "โต๊ะ 5 ตัว, เก้าอี้ 20 ตัว, แอร์, โปรเจคเตอร์",
     imageUrl: "https://images.pexels.com/photos/6899396/pexels-photo-6899396.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
     floor: "ชั้น 3",
-    building: "อาคาร A"
+    building: "ตึก F"
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const rooms = [
     facilities: "โต๊ะ 3 ตัว, เก้าอี้ 15 ตัว, แอร์, โปรเจคเตอร์, จอภาพ",
     imageUrl: "https://images.pexels.com/photos/2976970/pexels-photo-2976970.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
     floor: "ชั้น 5",
-    building: "อาคาร B"
+    building: "ตึก F"
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const rooms = [
     facilities: "โต๊ะ 2 ตัว, เก้าอี้ 10 ตัว, แอร์",
     imageUrl: "https://images.pexels.com/photos/7046168/pexels-photo-7046168.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
     floor: "ชั้น 2",
-    building: "อาคาร A"
+    building: "ตึก F"
   },
 ];
 
