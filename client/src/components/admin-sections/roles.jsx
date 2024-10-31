@@ -2,21 +2,51 @@ import { useState, useEffect } from "react";
 
 const Roles = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [roles, setRoles] = useState([{ name: "Admin" }, { name: "User" }]); // initial roles
+  const [newRole, setNewRole] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editRoleIndex, setEditRoleIndex] = useState(null);
+  const [accessLevel, setAccessLevel] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); // อัปเดตทุกๆ วินาที
+    }, 1000);
 
-    return () => clearInterval(interval); // Cleanup เมื่อตัว component ถูกยกเลิก
+    return () => clearInterval(interval);
   }, []);
 
-  // ดึงข้อมูลชื่อวัน, เดือน, และเวลาในรูปแบบที่ต้องการ
   const dayName = currentTime.toLocaleString("en-US", { weekday: "long" });
   const monthName = currentTime.toLocaleString("en-US", { month: "short" });
   const timeString = currentTime.toLocaleTimeString("en-US", {
-    hour12: false, // ใช้รูปแบบเวลา 24 ชั่วโมง
+    hour12: false,
   });
+
+  const addRole = () => {
+    if (newRole) {
+      setRoles([...roles, { name: newRole }]);
+      setNewRole("");
+    }
+  };
+
+  const deleteRole = (index) => {
+    setRoles(roles.filter((_, i) => i !== index));
+  };
+
+  const editRole = (index) => {
+    setIsEditing(true);
+    setEditRoleIndex(index);
+  };
+
+  const saveRole = () => {
+    const updatedRoles = roles.map((role, index) =>
+      index === editRoleIndex ? { ...role, access: accessLevel } : role
+    );
+    setRoles(updatedRoles);
+    setIsEditing(false);
+    setEditRoleIndex(null);
+    setAccessLevel("");
+  };
 
   return (
     <>
@@ -26,77 +56,32 @@ const Roles = () => {
           <div className="flex flex-col">
             <a className="text-2xl font-semibold mb-6">Logo</a>
             <nav className="flex flex-col gap-3">
-              <a
-                href="/admin_dashboard"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/dashboard.png"
-                  alt="My Icon"
-                  width="20"
-                  height="20"
-                />
+              {/* Navigation links */}
+              <a href="/admin_dashboard" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
+                <img src="/src/assets/dashboard.png" alt="My Icon" width="20" height="20" />
                 Dashboard
               </a>
-              <a
-                href="/employees"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/setting.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
+              <a href="/employees" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
+                <img src="/src/assets/setting.png" alt="My Icon" width="24" height="24" />
                 Employees
               </a>
               <a className="flex items-center gap-2 p-3 bg-indigo-700 rounded-lg">
-                <img
-                  src="/src/assets/hierarchical-structure.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
+                <img src="/src/assets/hierarchical-structure.png" alt="My Icon" width="24" height="24" />
                 Roles
               </a>
-              <a
-                href="/rooms"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/livingroom.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
+              <a href="/rooms" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
+                <img src="/src/assets/livingroom.png" alt="My Icon" width="24" height="24" />
                 Rooms
               </a>
-              <a
-                href="/reports"
-                className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg"
-              >
-                <img
-                  src="/src/assets/bar-chart.png"
-                  alt="My Icon"
-                  width="24"
-                  height="24"
-                />
+              <a href="/reports" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg">
+                <img src="/src/assets/bar-chart.png" alt="My Icon" width="24" height="24" />
                 Report
               </a>
             </nav>
           </div>
-
-          {/* ปุ่ม Logout */}
-          <a
-            href="/login"
-            className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto"
-          >
-            <img
-              src="/src/assets/logout.png"
-              alt="My Icon"
-              width="24"
-              height="24"
-            />
+          {/* Logout */}
+          <a href="/login" className="flex items-center gap-2 p-3 hover:bg-indigo-700 rounded-lg mt-auto">
+            <img src="/src/assets/logout.png" alt="My Icon" width="24" height="24" />
             Logout
           </a>
         </aside>
@@ -110,134 +95,102 @@ const Roles = () => {
                 <div className="flex flex-col">
                   <span className="countdown font-mono font-semibold text-2xl">
                     {dayName}
-                  </span>{" "}
-                  {/* แสดงชื่อวัน */}
+                  </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="countdown font-mono font-semibold text-2xl">
                     {monthName}
-                  </span>{" "}
-                  {/* แสดงชื่อเดือน */}
+                  </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="countdown font-mono font-semibold text-2xl">
                     {timeString}
-                  </span>{" "}
-                  {/* แสดงเวลา */}
+                  </span>
                 </div>
-              </div>
-            </div>
-            <div className="navbar-end">
-              {/* Cart Dropdown */}
-              <div className="dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle"
-                >
-                  <div className="indicator">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <span className="badge badge-sm indicator-item">8</span>
-                  </div>
-                </div>
-                <div
-                  tabIndex={0}
-                  className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-                >
-                  <div className="card-body">
-                    <span className="text-lg font-bold">8 Items</span>
-                    <span className="text-info">Subtotal: $999</span>
-                    <div className="card-actions">
-                      <button className="btn btn-primary btn-block">
-                        View cart
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* User Dropdown */}
-              <div className="dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle avatar"
-                >
-                  <div className="w-10 rounded-full">
-                    <img
-                      alt="User Avatar"
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                    />
-                  </div>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-                >
-                  <li>
-                    <a className="justify-between">
-                      Profile
-                      <span className="badge">New</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>Settings</a>
-                  </li>
-                  <li>
-                    <a>Logout</a>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
+
           <div className="min-h-screen bg-gray-300">
             {/* Main Content */}
             <div className="p-10">
               <h1 className="text-3xl font-semibold">Roles Management</h1>
               <div className="mt-6"></div>
               <h2 className="text-2xl font-semibold mb-4">Manage Roles</h2>
+
               <div className="flex flex-col gap-4">
                 {/* Add Role */}
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="New Role"
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
                     className="input input-bordered w-full max-w-xs"
                   />
-                  <button className="btn btn-primary">Add Role</button>
+                  <button onClick={addRole} className="btn btn-primary">
+                    Add Role
+                  </button>
                 </div>
 
                 {/* Existing Roles */}
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between p-2 bg-white rounded-lg shadow">
-                    <span>Admin</span>
-                    <div className="flex items-center gap-2">
-                      <button className="btn btn-sm btn-warning">Edit</button>
-                      <button className="btn btn-sm btn-error">Delete</button>
+                  {roles.map((role, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-white rounded-lg shadow">
+                      <span>{role.name}</span>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => editRole(index)} className="btn btn-sm btn-warning">
+                          Edit
+                        </button>
+                        <button onClick={() => deleteRole(index)} className="btn btn-sm btn-error">
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-white rounded-lg shadow">
-                    <span>User</span>
-                    <div className="flex items-center gap-2">
-                      <button className="btn btn-sm btn-warning">Edit</button>
-                      <button className="btn btn-sm btn-error">Delete</button>
-                    </div>
-                  </div>
-                  {/* Add more roles as needed */}
+                  ))}
                 </div>
+
+                {/* Edit Access Level */}
+                {isEditing && (
+                  <div className="p-4 bg-white rounded-lg shadow mt-4">
+                    <h3 className="text-xl font-semibold mb-2">Edit Access</h3>
+                    <div className="flex items-center gap-4">
+                      <label>
+                        <input
+                          type="radio"
+                          name="access"
+                          value="User Page"
+                          checked={accessLevel === "User Page"}
+                          onChange={(e) => setAccessLevel(e.target.value)}
+                        />
+                        User Page
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="access"
+                          value="Admin Page"
+                          checked={accessLevel === "Admin Page"}
+                          onChange={(e) => setAccessLevel(e.target.value)}
+                        />
+                        Admin Page
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="access"
+                          value="All"
+                          checked={accessLevel === "All"}
+                          onChange={(e) => setAccessLevel(e.target.value)}
+                        />
+                        All
+                      </label>
+                    </div>
+                    <button onClick={saveRole} className="btn btn-primary mt-4">
+                      Save
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
