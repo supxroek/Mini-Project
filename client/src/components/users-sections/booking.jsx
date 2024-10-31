@@ -9,6 +9,8 @@ const rooms = [
     description: "ห้องประชุมมาตรฐานสำหรับการประชุมทั่วไป",
     facilities: "โต๊ะ 5 ตัว, เก้าอี้ 20 ตัว, แอร์, โปรเจคเตอร์",
     imageUrl: "https://images.pexels.com/photos/6899396/pexels-photo-6899396.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
+    floor: "ชั้น 3",
+    building: "อาคาร A"
   },
   {
     id: 2,
@@ -17,6 +19,8 @@ const rooms = [
     description: "ห้องประชุม VIP พร้อมอุปกรณ์ครบครัน",
     facilities: "โต๊ะ 3 ตัว, เก้าอี้ 15 ตัว, แอร์, โปรเจคเตอร์, จอภาพ",
     imageUrl: "https://images.pexels.com/photos/2976970/pexels-photo-2976970.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
+    floor: "ชั้น 5",
+    building: "อาคาร B"
   },
   {
     id: 3,
@@ -25,8 +29,11 @@ const rooms = [
     description: "ห้องประชุมขนาดเล็กสำหรับทีมเล็ก",
     facilities: "โต๊ะ 2 ตัว, เก้าอี้ 10 ตัว, แอร์",
     imageUrl: "https://images.pexels.com/photos/7046168/pexels-photo-7046168.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&dpr=1",
+    floor: "ชั้น 2",
+    building: "อาคาร A"
   },
 ];
+
 
 const Booking = () => {
   const [date, setDate] = useState("");
@@ -209,38 +216,42 @@ const Booking = () => {
           </div>
         )}
 
-        {step === 2 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-4 gap-4">
-            {rooms.map((room) => (
-              <div key={room.id} className="card bg-base-200 shadow-lg">
-                <figure>
-                  <img src={room.imageUrl} alt={room.name} className="h-48 w-full object-contain rounded-lg" />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title">{room.name}</h2>
-                  <p>{room.description}</p>
-                  <p>Facilities: {room.facilities}</p>
-                  <p>Price: {room.price}</p>
-                  <button onClick={() => handleRoomSelection(room)} className="btn btn-primary">Select</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+{step === 2 && (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-4 gap-4">
+    {rooms.map((room) => (
+      <div key={room.id} className="card bg-base-200 shadow-lg">
+        <figure>
+          <img src={room.imageUrl} alt={room.name} className="h-48 w-full object-contain rounded-lg" />
+        </figure>
+        <div className="card-body">
+          <h2 className="card-title">{room.name}</h2>
+          <p>{room.description}</p>
+          <p>Facilities: {room.facilities}</p>
+          <p>Price: {room.price}</p>
+          <p>Floor: {room.floor}</p>   {/* Display floor */}
+          <p>Building: {room.building}</p>  {/* Display building */}
+          <button onClick={() => handleRoomSelection(room)} className="btn btn-primary">Select</button>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
-        {step === 3 && selectedRoom && (
-          <div className="p-4">
-            <h2 className="text-2xl font-bold">Confirm Booking for {selectedRoom.name}</h2>
-            <figure className="mb-4">
-              <img src={selectedRoom.imageUrl} alt={selectedRoom.name} className="h-48 w-full object-contain rounded-lg" />
-            </figure>
-            <p className="font-semibold">Description: {selectedRoom.description}</p>
-            <p className="font-semibold">Facilities: {selectedRoom.facilities}</p>
-            <p>Date: {date}</p>
-            <p>Time: {time}</p>
-            <p>Persons: {persons}</p>
+{step === 3 && selectedRoom && (
+  <div className="p-4">
+    <h2 className="text-2xl font-bold">Confirm Booking for {selectedRoom.name}</h2>
+    <figure className="mb-4">
+      <img src={selectedRoom.imageUrl} alt={selectedRoom.name} className="h-48 w-full object-contain rounded-lg" />
+    </figure>
+    <p className="font-semibold">Description: {selectedRoom.description}</p>
+    <p className="font-semibold">Facilities: {selectedRoom.facilities}</p>
+    <p>Floor: {selectedRoom.floor}</p>   {/* Display floor */}
+    <p>Building: {selectedRoom.building}</p>  {/* Display building */}
+    <p>Date: {date}</p>
+    <p>Time: {time}</p>
+    <p>Persons: {persons}</p>
 
-            <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4">
               <div className="mb-4">
                 <label>Name:</label>
                 <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="input w-full" />
@@ -259,10 +270,11 @@ const Booking = () => {
               </div>
             </div>
 
-            <button onClick={handleConfirmBooking} className="btn btn-success">Confirm Booking</button>
-            <button onClick={resetBooking} className="btn btn-secondary">Cancel</button>
-          </div>
-        )}
+    {/* Customer information form and buttons */}
+    <button onClick={handleConfirmBooking} className="btn btn-success">Confirm Booking</button>
+    <button onClick={resetBooking} className="btn btn-secondary">Cancel</button>
+  </div>
+)}
 
         {step === 4 && (
           <div className="p-4">
