@@ -1,5 +1,4 @@
-Update Now!!!
-
+# Mini Project: Meeting room booking & User Managements
 CONNECT DATABASE
 User: admin
 Password: admin123
